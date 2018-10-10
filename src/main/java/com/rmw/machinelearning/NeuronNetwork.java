@@ -1,5 +1,7 @@
 package com.rmw.machinelearning;
 
+import processing.core.PVector;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,16 +19,13 @@ class NeuronNetwork {
     private List<Neuron> hiddenNeurons = new ArrayList<>();
     private List<Neuron> outputNeurons = new ArrayList<>();
 
-    NeuronNetwork() {
+    NeuronNetwork(List<Float> weights) {
         setupNeurons();
-    }
-
-    void setWeights(List<Float> weights) {
         this.weights = weights;
         setupConnections();
     }
 
-    void calculate() {
+    PVector react() {
         hiddenNeurons.forEach(neuron -> neuron.setValue(0));
         outputNeurons.forEach(neuron -> neuron.setValue(0));
         connections.forEach(connection -> {
@@ -36,6 +35,13 @@ class NeuronNetwork {
             float newValue = destNeuronValue + (weight * linkedNeuronValue);
             findNeuronByName(connection.getTo()).setValue(newValue);
         });
+        float x = getNeuronValue("O1");
+        float y = getNeuronValue("O2");
+        return new PVector(x, y);
+    }
+
+    List<Float> getWeights() {
+        return weights;
     }
 
     void setInputNeuron(String name, float value) {
@@ -47,7 +53,7 @@ class NeuronNetwork {
         }
     }
 
-    float getNeuronValue(String name) {
+    private float getNeuronValue(String name) {
         Neuron neuron = findNeuronByName(name);
         if (neuron != null) {
             return neuron.getValue();

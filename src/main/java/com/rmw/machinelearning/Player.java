@@ -7,39 +7,46 @@ import java.util.List;
 
 class Player {
 
-    private PApplet parent;
+    private PApplet pApplet;
+    private NeuronNetwork neuronNetwork;
+
     private List<Wall> walls = Obstacles.getInstance().getObstacles();
+
     private PVector acceleration;
     private PVector position;
     private PVector velocity;
-    private Brain brain;
+
+
     private boolean dead = false;
+    private int lifespan = 0;
     private int radius = 10;
-    private int color = 255;
+
 
     Player(PApplet p, List<Float> weights) {
-        parent = p;
+        pApplet = p;
         position = new PVector(400, 200);
         acceleration = new PVector(0, 0);
         velocity = new PVector(5, 0);
-        brain = new Brain(weights);
+        neuronNetwork = new NeuronNetwork(weights);
     }
 
     boolean isDead() {
         return dead;
     }
 
-    void setAcceleration(PVector acc) {
-        acceleration = acc;
+    int getLifespan() { return lifespan; }
+
+    NeuronNetwork exposeNeuronNetwork() {
+        return neuronNetwork;
     }
 
     void look() {
         if (!dead) {
 
-            checkThreshold(Direction.RIGHT, parent.width - (position.x + radius));
+            checkThreshold(Direction.RIGHT, pApplet.width - (position.x + radius));
             checkThreshold(Direction.LEFT, position.x - radius);
             checkThreshold(Direction.TOP, position.y - radius);
-            checkThreshold(Direction.BOTTOM, parent.height - (position.y + radius));
+            checkThreshold(Direction.BOTTOM, pApplet.height - (position.y + radius));
 
             for (Wall wall : walls) {
                 if (position.y + radius >= wall.position.y && position.y - radius <= wall.position.y + wall.height) {
@@ -55,7 +62,7 @@ class Player {
     }
 
     void think() {
-        acceleration = brain.react();
+        acceleration = neuronNetwork.react();
     }
 
     void move() {
@@ -63,20 +70,22 @@ class Player {
             velocity.add(acceleration);
             velocity.limit(3);
             position.add(velocity);
+            lifespan++;
         }
     }
 
     void show() {
-        parent.fill(color);
-        parent.ellipse(position.x, position.y, radius * 2, radius * 2);
+        int color = 255;
+        pApplet.fill(color);
+        pApplet.ellipse(position.x, position.y, radius * 2, radius * 2);
     }
 
     void checkForCollisions() {
         if (!dead) {
             boolean collisionWithLeftBorder = position.x - radius <= 0;
-            boolean collisionWithRightBorder = position.x + radius >= parent.width;
+            boolean collisionWithRightBorder = position.x + radius >= pApplet.width;
             boolean collisionWithTopBorder = position.y - radius <= 0;
-            boolean collisionWithBottomBorder = position.y + radius >= parent.height;
+            boolean collisionWithBottomBorder = position.y + radius >= pApplet.height;
             if (collisionWithLeftBorder || collisionWithRightBorder || collisionWithTopBorder || collisionWithBottomBorder) {
                 dead = true;
                 return;
@@ -104,13 +113,13 @@ class Player {
         float distanceYThreshold = 10;
         if (direction.equals(Direction.RIGHT) || direction.equals(Direction.LEFT)) {
             if (distance > 0 && distance < distanceXThreshold) {
-                PApplet.println("Obstacle is too close to the " + direction + " The distance is " + distance);
-                brain.setInputNeuron(direction.getInputNeuron(), distanceXThreshold / distance);
+                // PApplet.println("Obstacle is too close to the " + direction + " The distance is " + distance);
+                neuronNetwork.setInputNeuron(direction.getInputNeuron(), distanceXThreshold / distance);
             }
         } else {
             if (distance > 0 && distance < distanceYThreshold) {
-                PApplet.println("Obstacle is too close to the " + direction + " The distance is " + distance);
-                brain.setInputNeuron(direction.getInputNeuron(), distanceYThreshold / distance);
+                // PApplet.println("Obstacle is too close to the " + direction + " The distance is " + distance);
+                neuronNetwork.setInputNeuron(direction.getInputNeuron(), distanceYThreshold / distance);
             }
         }
     }

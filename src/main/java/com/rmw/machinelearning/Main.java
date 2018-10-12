@@ -2,16 +2,15 @@ package com.rmw.machinelearning;
 
 import processing.core.PApplet;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main extends PApplet {
 
     private GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(this);
     private List<Wall> walls = Obstacles.getInstance().getObstacles();
     private List<Player> players;
-    private int counter = 500; //how long to let players live
+    private int counter = 1000; //how long to let players live
+    private int generationCounter = 0;
 
     public static void main(String[] args) {
         PApplet.main("com.rmw.machinelearning.Main", args);
@@ -38,13 +37,15 @@ public class Main extends PApplet {
             player.think();
             player.move();
             player.show();
-            player.checkForCollisions();
         }
         if (counter > 0) {
             counter--;
         } else {
-            players = geneticAlgorithm.getNextPopulation();
             counter = 1000;
+            generationCounter++;
+            players = geneticAlgorithm.getNextPopulation();
+            PApplet.println("New generation is ready and contains " + players.size() + " players");
+            PApplet.println("Generation " + generationCounter + ". Ready, Steady, GO!");
         }
     }
 

@@ -1,11 +1,11 @@
 package com.rmw.machinelearning;
 
-public class Connection {
+class Connection {
 
-    String name;
-    String from;
-    String to;
-    float weight;
+    private String name;
+    private String from;
+    private String to;
+    private float weight;
 
     Connection(String from, String to, float weight) {
         this.name = from + to;

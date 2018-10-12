@@ -11,7 +11,7 @@ class Wall {
     private PApplet parent;
 
     Wall(PApplet p, int x, int y, int width, int height) {
-        this.position = new PVector(x,y);
+        this.position = new PVector(x, y);
         this.width = width;
         this.height = height;
         this.parent = p;
@@ -19,7 +19,7 @@ class Wall {
 
     void show() {
         parent.fill(150);
-        parent.rect(position.x, position.y , width, height);
+        parent.rect(position.x, position.y, width, height);
     }
 
 }

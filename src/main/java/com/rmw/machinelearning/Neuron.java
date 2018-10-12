@@ -1,10 +1,10 @@
 package com.rmw.machinelearning;
 
-public class Neuron {
+class Neuron {
 
     String name;
-    float value;
     NeuronType type;
+    private float value;
 
     Neuron(String neuronName, NeuronType type) {
         this.name = neuronName;

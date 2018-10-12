@@ -15,11 +15,10 @@ class Player {
     private PVector acceleration;
     private PVector position;
     private PVector velocity;
-
-
-    private boolean dead = false;
-    private int lifespan = 0;
     private int radius = 10;
+
+    private int collidedTimes = 0; //how much time the ball collided with the wall
+    private int fitnessScore = 1000;
 
 
     Player(PApplet p, List<Float> weights) {
@@ -30,48 +29,52 @@ class Player {
         neuronNetwork = new NeuronNetwork(weights);
     }
 
-    boolean isDead() {
-        return dead;
+    void calculateFitness() {
+        fitnessScore -= collidedTimes;
     }
 
-    int getLifespan() { return lifespan; }
+    int getFitnessScore() {
+        return fitnessScore;
+    }
 
     NeuronNetwork exposeNeuronNetwork() {
         return neuronNetwork;
     }
 
     void look() {
-        if (!dead) {
+        checkThreshold(Direction.RIGHT, pApplet.width - (position.x + radius));
+        checkThreshold(Direction.LEFT, position.x - radius);
+        checkThreshold(Direction.TOP, position.y - radius);
+        checkThreshold(Direction.BOTTOM, pApplet.height - (position.y + radius));
 
-            checkThreshold(Direction.RIGHT, pApplet.width - (position.x + radius));
-            checkThreshold(Direction.LEFT, position.x - radius);
-            checkThreshold(Direction.TOP, position.y - radius);
-            checkThreshold(Direction.BOTTOM, pApplet.height - (position.y + radius));
-
-            for (Wall wall : walls) {
-                if (position.y + radius >= wall.position.y && position.y - radius <= wall.position.y + wall.height) {
-                    checkThreshold(Direction.RIGHT, wall.position.x - (position.x + radius));
-                    checkThreshold(Direction.LEFT, (position.x - radius) - (wall.position.x + wall.width));
-                }
-                if (position.x + radius >= wall.position.x && position.x - radius <= wall.position.x + wall.width) {
-                    checkThreshold(Direction.TOP, (position.y - radius) - (wall.position.y + wall.width));
-                    checkThreshold(Direction.BOTTOM, wall.position.y - (position.y + radius));
-                }
+        for (Wall wall : walls) {
+            if (position.y + radius >= wall.position.y && position.y - radius <= wall.position.y + wall.height) {
+                checkThreshold(Direction.RIGHT, wall.position.x - (position.x + radius));
+                checkThreshold(Direction.LEFT, (position.x - radius) - (wall.position.x + wall.width));
+            }
+            if (position.x + radius >= wall.position.x && position.x - radius <= wall.position.x + wall.width) {
+                checkThreshold(Direction.TOP, (position.y - radius) - (wall.position.y + wall.width));
+                checkThreshold(Direction.BOTTOM, wall.position.y - (position.y + radius));
             }
         }
     }
+
 
     void think() {
         acceleration = neuronNetwork.react();
     }
 
     void move() {
-        if (!dead) {
-            velocity.add(acceleration);
-            velocity.limit(3);
-            position.add(velocity);
-            lifespan++;
+
+        velocity.add(acceleration);
+        velocity.limit(3);
+        boolean collided = isCollidingWithAnObstacle(position.x + velocity.x, position.y + velocity.y);
+        if (collided) {
+            collidedTimes++;
+            velocity.rotate(180);
         }
+        position.add(velocity);
+
     }
 
     void show() {
@@ -80,33 +83,34 @@ class Player {
         pApplet.ellipse(position.x, position.y, radius * 2, radius * 2);
     }
 
-    void checkForCollisions() {
-        if (!dead) {
-            boolean collisionWithLeftBorder = position.x - radius <= 0;
-            boolean collisionWithRightBorder = position.x + radius >= pApplet.width;
-            boolean collisionWithTopBorder = position.y - radius <= 0;
-            boolean collisionWithBottomBorder = position.y + radius >= pApplet.height;
-            if (collisionWithLeftBorder || collisionWithRightBorder || collisionWithTopBorder || collisionWithBottomBorder) {
-                dead = true;
-                return;
-            }
+    private boolean isCollidingWithAnObstacle(float x, float y) {
 
-            for (Wall wall : walls) {
-                boolean rightSideCollision = position.x + radius >= wall.position.x;
-                boolean leftSideCollision = position.x - radius <= wall.position.x + wall.width;
-                boolean bottomSideCollision = position.y + radius >= wall.position.y;
-                boolean topSideCollision = position.y - radius <= wall.position.y + wall.height;
-                if (rightSideCollision &&
-                        leftSideCollision &&
-                        bottomSideCollision &&
-                        topSideCollision
-                ) {
-                    dead = true;
-                    return;
-                }
+        boolean collisionWithLeftBorder = x - radius <= 0;
+        boolean collisionWithRightBorder = x + radius >= pApplet.width;
+        boolean collisionWithTopBorder = y - radius <= 0;
+        boolean collisionWithBottomBorder = y + radius >= pApplet.height;
+        if (collisionWithLeftBorder || collisionWithRightBorder || collisionWithTopBorder || collisionWithBottomBorder) {
+            //dead = true;
+            return true;
+        }
+
+        for (Wall wall : walls) {
+            boolean rightSideCollision = x + radius >= wall.position.x;
+            boolean leftSideCollision = x - radius <= wall.position.x + wall.width;
+            boolean bottomSideCollision = y + radius >= wall.position.y;
+            boolean topSideCollision = y - radius <= wall.position.y + wall.height;
+            if (rightSideCollision &&
+                    leftSideCollision &&
+                    bottomSideCollision &&
+                    topSideCollision
+            ) {
+                //dead = true;
+                return true;
             }
         }
+        return false;
     }
+
 
     private void checkThreshold(Direction direction, float distance) {
         float distanceXThreshold = 10;

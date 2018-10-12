@@ -9,8 +9,7 @@ import java.util.List;
 class GeneticAlgorithm {
 
     private PApplet pApplet;
-    private static final int AMOUNT_OF_PLAYERS = 100;
-    private static final float MUTATION_RATIO = 0.001f;
+    private static final int AMOUNT_OF_PLAYERS = 10;
     private List<Player> players;
 
     GeneticAlgorithm(PApplet p) {
@@ -26,54 +25,79 @@ class GeneticAlgorithm {
     }
 
     List<Player> getNextPopulation() {
+        int topBestPlayersThreshold = 5;
+        double percentageOfCrossoverBabies = 0.6;
+        double percentageOfMutatedBabies = 0.4;
+
         sortPlayerBasedOnFitnessFunction();
-        Player best = players.get(0);
-        Player secondBest = players.get(1);
-        PApplet.println("Best player survived for " + best.getLifespan());
-        PApplet.println("Second best player survived for " + secondBest.getLifespan());
-        PApplet.println("Parent 1 genes: " + best.exposeNeuronNetwork().getWeights());
-        PApplet.println("Parent 2 genes: " + secondBest.exposeNeuronNetwork().getWeights());
+        List<Player> bestPlayers = new ArrayList<>(players.subList(0, topBestPlayersThreshold));
+        List<Float> bestGenes = bestPlayers.get(0).exposeNeuronNetwork().getWeights();
+        PApplet.println("Best player has fitness score of " + bestPlayers.get(0).getFitnessScore());
+        PApplet.println("Best genes: " + bestGenes);
         players.clear();
-        for (int i = 0; i < AMOUNT_OF_PLAYERS/2; i++) {
-            crossoverGenes(best, secondBest);
+
+        for (int i = 0; i < (AMOUNT_OF_PLAYERS * percentageOfCrossoverBabies) / 2; i++) {
+            breedRegularBabies(bestPlayers.get(0), bestPlayers.get((int) pApplet.random(1, topBestPlayersThreshold - 1)));
         }
+        for (int i = 0; i < (AMOUNT_OF_PLAYERS * percentageOfMutatedBabies) / 2; i++) {
+            breedMutatedBabies(bestPlayers.get(0), bestPlayers.get((int) pApplet.random(1, topBestPlayersThreshold - 1)));
+        }
+        players.add(new Player(pApplet, bestGenes));
+
         return players;
     }
 
     private void sortPlayerBasedOnFitnessFunction() {
-        players.sort(Comparator.comparing(Player::getLifespan).reversed());
+        players.forEach(Player::calculateFitness);
+        players.sort(Comparator.comparing(Player::getFitnessScore).reversed());
     }
 
-    private void crossoverGenes(Player parent1, Player parent2) {
+    private void breedRegularBabies(Player parent1, Player parent2) {
         //copy the genes but do not modify the parent ones
         List<Float> genes1 = new ArrayList<>(parent1.exposeNeuronNetwork().getWeights());
         List<Float> genes2 = new ArrayList<>(parent2.exposeNeuronNetwork().getWeights());
-        int randomIndex = (int) pApplet.random(0, genes2.size());
-        for (int i = 0; i < randomIndex; i++) {
-            float temp = genes1.get(i);
-            genes1.set(i, genes2.get(i));
-            genes2.set(i, temp);
+        chromosomalCrossover(genes1, genes2);
+        players.add(new Player(pApplet, genes1));
+        players.add(new Player(pApplet, genes2));
+    }
+
+    private void breedMutatedBabies(Player parent1, Player parent2) {
+        //copy the genes but do not modify the parent ones
+        List<Float> genes1 = new ArrayList<>(parent1.exposeNeuronNetwork().getWeights());
+        List<Float> genes2 = new ArrayList<>(parent2.exposeNeuronNetwork().getWeights());
+        chromosomalCrossover(genes1, genes2);
+        for (int i = 0; i < genes1.size(); i++) {
+            if ((int) pApplet.random(5) > 2) {
+                genes1.set(i, generateRandomWeight());
+            }
+            if ((int) pApplet.random(5) > 2) {
+                genes2.set(i, generateRandomWeight());
+            }
         }
         players.add(new Player(pApplet, genes1));
         players.add(new Player(pApplet, genes2));
-        PApplet.println("New babies are ready!");
-        PApplet.println("Baby 1 genes: "+ genes1);
-        PApplet.println("Baby 2 genes: "+ genes2);
+    }
+
+    private void chromosomalCrossover(List<Float> parent1Genes, List<Float> parent2Genes) {
+        for (int i = 0; i < parent1Genes.size(); i++) {
+            //swap random genes
+            if ((int) pApplet.random(5) > 2) {
+                float temp = parent1Genes.get(i);
+                parent1Genes.set(i, parent2Genes.get(i));
+                parent2Genes.set(i, temp);
+            }
+        }
     }
 
     private List<Float> generateRandomWeights() {
         List<Float> result = new ArrayList<>();
         for (int i = 0; i < 36; i++) {
-            result.add((pApplet.random(-2, 2)));
+            result.add(generateRandomWeight());
         }
         return result;
     }
 
-    private void mutate(NeuronNetwork neuronNetwork) {
-        List<Float> weights = neuronNetwork.getWeights();
-        int randomIndex = (int) pApplet.random(weights.size());
-        weights.set(randomIndex, weights.get(randomIndex) * MUTATION_RATIO);
+    private float generateRandomWeight() {
+        return pApplet.random(-1, 1);
     }
-
-
 }

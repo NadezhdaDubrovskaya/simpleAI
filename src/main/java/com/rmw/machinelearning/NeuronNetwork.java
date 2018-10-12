@@ -8,7 +8,7 @@ import java.util.List;
 class NeuronNetwork {
 
     private final static int amountOfInputNeurons = 4;
-    private final static int amountOfHiddenNeurons = 6;
+    private final static int amountOfHiddenNeurons = 4;
     private final static int amountOfOutputNeurons = 2;
 
     private List<Neuron> neurons = new ArrayList<>();
@@ -26,14 +26,17 @@ class NeuronNetwork {
     }
 
     PVector react() {
+        //clearing the neuron network
         hiddenNeurons.forEach(neuron -> neuron.setValue(0));
         outputNeurons.forEach(neuron -> neuron.setValue(0));
         connections.forEach(connection -> {
-            float linkedNeuronValue = getNeuronValue(connection.getFrom());
-            float destNeuronValue = getNeuronValue(connection.getTo());
+            String destinationNeuron = connection.getTo();
+            String linkedNeuron = connection.getFrom();
             float weight = connection.getWeight();
-            float newValue = destNeuronValue + (weight * linkedNeuronValue);
-            findNeuronByName(connection.getTo()).setValue(newValue);
+            float linkedNeuronValue = getNeuronValue(linkedNeuron);
+            float destNeuronValue = getNeuronValue(destinationNeuron);
+            float newValue = (float) Math.tanh(destNeuronValue + (weight * linkedNeuronValue));
+            findNeuronByName(destinationNeuron).setValue(newValue);
         });
         float x = getNeuronValue("O1");
         float y = getNeuronValue("O2");
@@ -63,7 +66,7 @@ class NeuronNetwork {
     }
 
     private Neuron findNeuronByName(String name) {
-        return neurons.stream().filter( x -> x.name.equals(name)).findAny().orElse(null);
+        return neurons.stream().filter(x -> x.name.equals(name)).findAny().orElse(null);
     }
 
     private void setupNeurons() {

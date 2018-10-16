@@ -23,9 +23,9 @@ class Player {
 
     Player(PApplet p, List<Float> weights) {
         pApplet = p;
-        position = new PVector(400, 200);
+        position = new PVector(pApplet.width - 50, pApplet.height - 50);
         acceleration = new PVector(0, 0);
-        velocity = new PVector(5, 0);
+        velocity = new PVector(0, -5);
         neuronNetwork = new NeuronNetwork(weights);
     }
 
@@ -42,10 +42,30 @@ class Player {
     }
 
     void look() {
-        checkThreshold(Direction.RIGHT, pApplet.width - (position.x + radius));
-        checkThreshold(Direction.LEFT, position.x - radius);
-        checkThreshold(Direction.TOP, position.y - radius);
-        checkThreshold(Direction.BOTTOM, pApplet.height - (position.y + radius));
+        if (!dead) {
+
+            float distanceRight = pApplet.width - (position.x + radius);
+            float distanceLeft = position.x - radius;
+            float distanceTop = position.y - radius;
+            //float distanceBottom = pApplet.height - (position.y + radius);
+
+            for (Wall wall : walls) {
+                distanceRight = Math.min(distanceRight, wall.position.x - (position.x + radius));
+                distanceLeft = Math.min(distanceLeft, (position.x - radius) - (wall.position.x + wall.width));
+                distanceTop = Math.min(distanceTop, (position.y - radius) - (wall.position.y + wall.width));
+                //distanceBottom = Math.min(distanceBottom, wall.position.y - (position.y + radius));
+            }
+
+            neuronNetwork.setInputNeuron(Direction.RIGHT.getInputNeuron(), distanceRight / 100);
+            neuronNetwork.setInputNeuron(Direction.LEFT.getInputNeuron(), distanceLeft / 100);
+            neuronNetwork.setInputNeuron(Direction.TOP.getInputNeuron(), distanceTop / 100);
+            //neuronNetwork.setInputNeuron(Direction.BOTTOM.getInputNeuron(), distanceBottom / 100);
+
+            /*
+            checkThreshold(Direction.RIGHT, pApplet.width - (position.x + radius));
+            checkThreshold(Direction.LEFT, position.x - radius);
+            checkThreshold(Direction.TOP, position.y - radius);
+            checkThreshold(Direction.BOTTOM, pApplet.height - (position.y + radius));
 
         for (Wall wall : walls) {
             if (position.y + radius >= wall.position.y && position.y - radius <= wall.position.y + wall.height) {
@@ -56,6 +76,7 @@ class Player {
                 checkThreshold(Direction.TOP, (position.y - radius) - (wall.position.y + wall.width));
                 checkThreshold(Direction.BOTTOM, wall.position.y - (position.y + radius));
             }
+            */
         }
     }
 

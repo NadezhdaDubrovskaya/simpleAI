@@ -5,7 +5,7 @@ import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
-class NeuronNetwork {
+class NeuralNetwork {
 
     private final static int amountOfInputNeurons = 4;
     private final static int amountOfHiddenNeurons = 4;
@@ -19,7 +19,7 @@ class NeuronNetwork {
     private List<Neuron> hiddenNeurons = new ArrayList<>();
     private List<Neuron> outputNeurons = new ArrayList<>();
 
-    NeuronNetwork(List<Float> weights) {
+    NeuralNetwork(List<Float> weights) {
         setupNeurons();
         this.weights = weights;
         setupConnections();

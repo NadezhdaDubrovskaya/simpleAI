@@ -9,7 +9,7 @@ import java.util.List;
 class GeneticAlgorithm {
 
     private PApplet pApplet;
-    private static final int AMOUNT_OF_PLAYERS = 10;
+    private static final int AMOUNT_OF_PLAYERS = 500;
     private List<Player> players;
 
     GeneticAlgorithm(PApplet p) {

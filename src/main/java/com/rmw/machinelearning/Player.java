@@ -8,9 +8,9 @@ import java.util.List;
 class Player {
 
     private PApplet pApplet;
-    private NeuronNetwork neuronNetwork;
+    private NeuralNetwork neuralNetwork;
 
-    private List<Wall> walls = Obstacles.getInstance().getObstacles();
+    private List<Wall> walls;
 
     private PVector acceleration;
     private PVector position;
@@ -18,48 +18,50 @@ class Player {
     private int radius = 10;
 
     private int collidedTimes = 0; //how much time the ball collided with the wall
+    private int currentMovesWithoutColliding = 0;
+
+    private int maxMovesWithoutColliding = 0;
+    private int maxSpeed = 0;
     private int fitnessScore = 1000;
 
 
     Player(PApplet p, List<Float> weights) {
         pApplet = p;
+        walls = Obstacles.getInstance(pApplet).getObstacles();
         position = new PVector(pApplet.width - 50, pApplet.height - 50);
         acceleration = new PVector(0, 0);
         velocity = new PVector(0, -5);
-        neuronNetwork = new NeuronNetwork(weights);
+        neuralNetwork = new NeuralNetwork(weights);
     }
 
     void calculateFitness() {
         fitnessScore -= collidedTimes;
+        fitnessScore += maxMovesWithoutColliding;
     }
 
     int getFitnessScore() {
         return fitnessScore;
     }
 
-    NeuronNetwork exposeNeuronNetwork() {
-        return neuronNetwork;
+    NeuralNetwork exposeNeuronNetwork() {
+        return neuralNetwork;
     }
 
     void look() {
-        if (!dead) {
 
-            float distanceRight = pApplet.width - (position.x + radius);
-            float distanceLeft = position.x - radius;
-            float distanceTop = position.y - radius;
-            //float distanceBottom = pApplet.height - (position.y + radius);
+        float distanceRight = pApplet.width - (position.x + radius);
+        float distanceLeft = position.x - radius;
+        float distanceTop = position.y - radius;
 
-            for (Wall wall : walls) {
-                distanceRight = Math.min(distanceRight, wall.position.x - (position.x + radius));
-                distanceLeft = Math.min(distanceLeft, (position.x - radius) - (wall.position.x + wall.width));
-                distanceTop = Math.min(distanceTop, (position.y - radius) - (wall.position.y + wall.width));
-                //distanceBottom = Math.min(distanceBottom, wall.position.y - (position.y + radius));
-            }
+        for (Wall wall : walls) {
+            distanceRight = Math.min(distanceRight, wall.position.x - (position.x + radius));
+            distanceLeft = Math.min(distanceLeft, (position.x - radius) - (wall.position.x + wall.width));
+            distanceTop = Math.min(distanceTop, (position.y - radius) - (wall.position.y + wall.width));
+        }
 
-            neuronNetwork.setInputNeuron(Direction.RIGHT.getInputNeuron(), distanceRight / 100);
-            neuronNetwork.setInputNeuron(Direction.LEFT.getInputNeuron(), distanceLeft / 100);
-            neuronNetwork.setInputNeuron(Direction.TOP.getInputNeuron(), distanceTop / 100);
-            //neuronNetwork.setInputNeuron(Direction.BOTTOM.getInputNeuron(), distanceBottom / 100);
+        neuralNetwork.setInputNeuron(Direction.RIGHT.getInputNeuron(), distanceRight / 100);
+        neuralNetwork.setInputNeuron(Direction.LEFT.getInputNeuron(), distanceLeft / 100);
+        neuralNetwork.setInputNeuron(Direction.TOP.getInputNeuron(), distanceTop / 100);
 
             /*
             checkThreshold(Direction.RIGHT, pApplet.width - (position.x + radius));
@@ -77,12 +79,11 @@ class Player {
                 checkThreshold(Direction.BOTTOM, wall.position.y - (position.y + radius));
             }
             */
-        }
     }
 
 
     void think() {
-        acceleration = neuronNetwork.react();
+        acceleration = neuralNetwork.react();
     }
 
     void move() {
@@ -92,10 +93,13 @@ class Player {
         boolean collided = isCollidingWithAnObstacle(position.x + velocity.x, position.y + velocity.y);
         if (collided) {
             collidedTimes++;
+            maxMovesWithoutColliding = Math.max(maxMovesWithoutColliding, currentMovesWithoutColliding);
+            currentMovesWithoutColliding = 0;
             velocity.rotate(180);
+        } else {
+            currentMovesWithoutColliding++;
         }
         position.add(velocity);
-
     }
 
     void show() {
@@ -139,12 +143,12 @@ class Player {
         if (direction.equals(Direction.RIGHT) || direction.equals(Direction.LEFT)) {
             if (distance > 0 && distance < distanceXThreshold) {
                 // PApplet.println("Obstacle is too close to the " + direction + " The distance is " + distance);
-                neuronNetwork.setInputNeuron(direction.getInputNeuron(), distanceXThreshold / distance);
+                neuralNetwork.setInputNeuron(direction.getInputNeuron(), distanceXThreshold / distance);
             }
         } else {
             if (distance > 0 && distance < distanceYThreshold) {
                 // PApplet.println("Obstacle is too close to the " + direction + " The distance is " + distance);
-                neuronNetwork.setInputNeuron(direction.getInputNeuron(), distanceYThreshold / distance);
+                neuralNetwork.setInputNeuron(direction.getInputNeuron(), distanceYThreshold / distance);
             }
         }
     }

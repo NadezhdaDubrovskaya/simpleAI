@@ -34,9 +34,17 @@ class Obstacles {
     }
 
     private void setupWalls() {
-        walls.add(new Wall(pApplet, 600, 100, 50, 200));
-        walls.add(new Wall(pApplet, 100, 100, 50, 200));
-        walls.add(new Wall(pApplet, 200, 500, 50, 200));
+        walls.add(new Wall(pApplet, 100, 0, 50, 400));
+        walls.add(new Wall(pApplet, 100, 500, 50, 300));
+        walls.add(new Wall(pApplet, 200, 0, 50, 600));
+        walls.add(new Wall(pApplet, 300, 100, 50, 700));
+        walls.add(new Wall(pApplet, 400, 0, 50, 200));
+        walls.add(new Wall(pApplet, 400, 300, 50, 500));
+        walls.add(new Wall(pApplet, 500, 500, 50, 300));
+        walls.add(new Wall(pApplet, 500, 0, 50, 400));
+        walls.add(new Wall(pApplet, 600, 0, 50, 600));
+        walls.add(new Wall(pApplet, 700, 0, 50, 200));
+        walls.add(new Wall(pApplet, 700, 300, 50, 500));
     }
 
 }

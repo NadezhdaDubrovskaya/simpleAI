@@ -2,8 +2,6 @@ package com.rmw.machinelearning;
 
 import processing.core.PApplet;
 
-import java.util.List;
-
 public class Main extends PApplet {
 
     private Obstacles obstacles = Obstacles.getInstance(this);
@@ -14,7 +12,7 @@ public class Main extends PApplet {
     }
 
     public void settings() {
-        size(800, 800);
+        size(Configuration.width, Configuration.height);
     }
 
     public void setup() {

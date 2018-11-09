@@ -7,10 +7,6 @@ import java.util.List;
 
 class NeuralNetwork {
 
-    private final static int amountOfInputNeurons = 4;
-    private final static int amountOfHiddenNeurons = 4;
-    private final static int amountOfOutputNeurons = 2;
-
     private List<Neuron> neurons = new ArrayList<>();
     private List<Connection> connections = new ArrayList<>();
     private List<Float> weights;
@@ -20,8 +16,8 @@ class NeuralNetwork {
     private List<Neuron> outputNeurons = new ArrayList<>();
 
     NeuralNetwork(List<Float> weights) {
-        setupNeurons();
         this.weights = weights;
+        setupNeurons();
         setupConnections();
     }
 
@@ -40,6 +36,7 @@ class NeuralNetwork {
         });
         float x = getNeuronValue("O1");
         float y = getNeuronValue("O2");
+        inputNeurons.forEach(neuron -> neuron.setValue(0));
         return new PVector(x, y);
     }
 
@@ -48,12 +45,16 @@ class NeuralNetwork {
     }
 
     void setInputNeuron(String name, float value) {
-        Neuron neuron = inputNeurons.stream().filter(x -> x.name.equals(name)).findAny().orElse(null);
+        Neuron neuron = findNeuronByName(name);
         if (neuron != null) {
             neuron.setValue(value);
         } else {
-            throw new Error("com.rmw.machinelearning.Neuron with " + name + " doesn't exist");
+            throw new Error("Neuron with " + name + " doesn't exist");
         }
+    }
+
+    void clearInputs() {
+        inputNeurons.forEach(neuron -> neuron.setValue(0));
     }
 
     private float getNeuronValue(String name) {
@@ -70,17 +71,17 @@ class NeuralNetwork {
     }
 
     private void setupNeurons() {
-        for (int i = 1; i <= amountOfInputNeurons; i++) {
+        for (int i = 1; i <= Configuration.AMOUNT_OF_INPUT_NEURONS; i++) {
             Neuron neuron = new Neuron("I" + i, NeuronType.Input);
             neurons.add(neuron);
             inputNeurons.add(neuron);
         }
-        for (int i = 1; i <= amountOfHiddenNeurons; i++) {
+        for (int i = 1; i <= Configuration.AMOUNT_OF_HIDDEN_NEURONS; i++) {
             Neuron neuron = new Neuron("H" + i, NeuronType.Hidden);
             neurons.add(neuron);
             hiddenNeurons.add(neuron);
         }
-        for (int i = 1; i <= amountOfOutputNeurons; i++) {
+        for (int i = 1; i <= Configuration.AMOUNT_OF_OUTPUT_NEURONS; i++) {
             Neuron neuron = new Neuron("O" + i, NeuronType.Output);
             neurons.add(neuron);
             outputNeurons.add(neuron);

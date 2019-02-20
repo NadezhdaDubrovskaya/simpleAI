@@ -3,22 +3,47 @@ package com.rmw.machinelearning;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-class Wall {
+class Wall extends ScreenObject {
 
-    PVector position;
-    int width;
-    int height;
-    private PApplet parent;
+    private static final int COLOUR = 150;
+    private final PApplet parent;
+    private final int width;
+    private final int height;
 
-    Wall(PApplet p, int x, int y, int width, int height) {
-        this.position = new PVector(x, y);
+    Wall(final PApplet p, final int x, final int y, final int width, final int height) {
+        position = new PVector(x, y);
         this.width = width;
         this.height = height;
-        this.parent = p;
+        parent = p;
     }
 
-    void show() {
-        parent.fill(150);
+    @Override
+    void update() {
+        show();
+    }
+
+    @Override
+    float getTopBorder() {
+        return position.y;
+    }
+
+    @Override
+    float getBottomBorder() {
+        return position.y + height;
+    }
+
+    @Override
+    float getLeftBorder() {
+        return position.x;
+    }
+
+    @Override
+    float getRightBorder() {
+        return position.x + width;
+    }
+
+    private void show() {
+        parent.fill(COLOUR);
         parent.rect(position.x, position.y, width, height);
     }
 

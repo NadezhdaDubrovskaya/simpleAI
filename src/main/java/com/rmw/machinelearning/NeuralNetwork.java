@@ -1,21 +1,23 @@
 package com.rmw.machinelearning;
 
+import com.rmw.machinelearning.model.Connection;
+import com.rmw.machinelearning.model.Neuron;
 import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class NeuralNetwork {
 
-    private List<Neuron> neurons = new ArrayList<>();
+    private final List<Neuron> neurons = new ArrayList<>();
+    private final List<Float> weights;
+    private final List<Neuron> inputNeurons = new ArrayList<>();
+    private final List<Neuron> hiddenNeurons = new ArrayList<>();
+    private final List<Neuron> outputNeurons = new ArrayList<>();
     private List<Connection> connections = new ArrayList<>();
-    private List<Float> weights;
 
-    private List<Neuron> inputNeurons = new ArrayList<>();
-    private List<Neuron> hiddenNeurons = new ArrayList<>();
-    private List<Neuron> outputNeurons = new ArrayList<>();
-
-    NeuralNetwork(List<Float> weights) {
+    NeuralNetwork(final List<Float> weights) {
         this.weights = weights;
         setupNeurons();
         setupConnections();
@@ -26,16 +28,16 @@ class NeuralNetwork {
         hiddenNeurons.forEach(neuron -> neuron.setValue(0));
         outputNeurons.forEach(neuron -> neuron.setValue(0));
         connections.forEach(connection -> {
-            String destinationNeuron = connection.getTo();
-            String linkedNeuron = connection.getFrom();
-            float weight = connection.getWeight();
-            float linkedNeuronValue = getNeuronValue(linkedNeuron);
-            float destNeuronValue = getNeuronValue(destinationNeuron);
-            float newValue = (float) Math.tanh(destNeuronValue + (weight * linkedNeuronValue));
+            final String destinationNeuron = connection.getTo();
+            final String linkedNeuron = connection.getFrom();
+            final float weight = connection.getWeight();
+            final float linkedNeuronValue = getNeuronValue(linkedNeuron);
+            final float destNeuronValue = getNeuronValue(destinationNeuron);
+            final float newValue = (float) Math.tanh(destNeuronValue + (weight * linkedNeuronValue));
             findNeuronByName(destinationNeuron).setValue(newValue);
         });
-        float x = getNeuronValue("O1");
-        float y = getNeuronValue("O2");
+        final float x = getNeuronValue("O1");
+        final float y = getNeuronValue("O2");
         inputNeurons.forEach(neuron -> neuron.setValue(0));
         return new PVector(x, y);
     }
@@ -44,8 +46,8 @@ class NeuralNetwork {
         return weights;
     }
 
-    void setInputNeuron(String name, float value) {
-        Neuron neuron = findNeuronByName(name);
+    void setInputNeuron(final String name, final float value) {
+        final Neuron neuron = findNeuronByName(name);
         if (neuron != null) {
             neuron.setValue(value);
         } else {
@@ -57,8 +59,8 @@ class NeuralNetwork {
         inputNeurons.forEach(neuron -> neuron.setValue(0));
     }
 
-    private float getNeuronValue(String name) {
-        Neuron neuron = findNeuronByName(name);
+    private float getNeuronValue(final String name) {
+        final Neuron neuron = findNeuronByName(name);
         if (neuron != null) {
             return neuron.getValue();
         } else {
@@ -66,23 +68,23 @@ class NeuralNetwork {
         }
     }
 
-    private Neuron findNeuronByName(String name) {
-        return neurons.stream().filter(x -> x.name.equals(name)).findAny().orElse(null);
+    private Neuron findNeuronByName(final String name) {
+        return neurons.stream().filter(x -> x.getName().equals(name)).findAny().orElse(null);
     }
 
     private void setupNeurons() {
         for (int i = 1; i <= Configuration.AMOUNT_OF_INPUT_NEURONS; i++) {
-            Neuron neuron = new Neuron("I" + i, NeuronType.Input);
+            final Neuron neuron = new Neuron("I" + i, NeuronType.Input);
             neurons.add(neuron);
             inputNeurons.add(neuron);
         }
         for (int i = 1; i <= Configuration.AMOUNT_OF_HIDDEN_NEURONS; i++) {
-            Neuron neuron = new Neuron("H" + i, NeuronType.Hidden);
+            final Neuron neuron = new Neuron("H" + i, NeuronType.Hidden);
             neurons.add(neuron);
             hiddenNeurons.add(neuron);
         }
         for (int i = 1; i <= Configuration.AMOUNT_OF_OUTPUT_NEURONS; i++) {
-            Neuron neuron = new Neuron("O" + i, NeuronType.Output);
+            final Neuron neuron = new Neuron("O" + i, NeuronType.Output);
             neurons.add(neuron);
             outputNeurons.add(neuron);
         }
@@ -91,15 +93,15 @@ class NeuralNetwork {
     private void setupConnections() {
         connections = new ArrayList<>();
         int weightIndex = 0;
-        for (Neuron neuron : neurons) {
-            if (neuron.type == NeuronType.Input) {
-                for (Neuron hiddenNeuron : hiddenNeurons) {
-                    connections.add(new Connection(neuron.name, hiddenNeuron.name, weights.get(weightIndex++)));
+        for (final Neuron neuron : neurons) {
+            if (neuron.getType() == NeuronType.Input) {
+                for (final Neuron hiddenNeuron : hiddenNeurons) {
+                    connections.add(new Connection(neuron.getName(), hiddenNeuron.getName(), weights.get(weightIndex++)));
                 }
             }
-            if (neuron.type == NeuronType.Hidden) {
-                for (Neuron outputNeuron : outputNeurons) {
-                    connections.add(new Connection(neuron.name, outputNeuron.name, weights.get(weightIndex++)));
+            if (neuron.getType() == NeuronType.Hidden) {
+                for (final Neuron outputNeuron : outputNeurons) {
+                    connections.add(new Connection(neuron.getName(), outputNeuron.getName(), weights.get(weightIndex++)));
                 }
             }
         }

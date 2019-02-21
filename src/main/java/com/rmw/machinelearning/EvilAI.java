@@ -3,20 +3,19 @@ package com.rmw.machinelearning;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import static com.rmw.machinelearning.Configuration.EVIL_AI_COLOUR;
-import static com.rmw.machinelearning.Configuration.PLAYER_RADIUS;
+import static com.rmw.machinelearning.Configuration.HEIGHT;
 import static com.rmw.machinelearning.Configuration.PLAYER_SPEED_LIMIT;
+import static com.rmw.machinelearning.Configuration.WIDTH;
+import static com.rmw.machinelearning.Utility.maybeYes;
 
-class EvilAI extends ScreenObject {
-
-    private final PApplet pApplet;
+class EvilAI extends CircularObject {
 
     private final PVector acceleration;
     private final PVector velocity;
 
     EvilAI(final PApplet pApplet) {
-        this.pApplet = pApplet;
-        position = new PVector(150, 150);
+        super(pApplet);
+        getPosition().set(pApplet.random(0, WIDTH), pApplet.random(0, HEIGHT));
         velocity = new PVector(0, 0);
         acceleration = new PVector(0, 0);
     }
@@ -27,36 +26,21 @@ class EvilAI extends ScreenObject {
         show();
     }
 
-    //TODO move into separate class getTop/Bottom/Left/Right borders
-    @Override
-    float getTopBorder() {
-        return position.y - PLAYER_RADIUS;
-    }
-
-    @Override
-    float getBottomBorder() {
-        return position.y + PLAYER_RADIUS;
-    }
-
-    @Override
-    float getLeftBorder() {
-        return position.x - PLAYER_RADIUS;
-    }
-
-    @Override
-    float getRightBorder() {
-        return position.x + PLAYER_RADIUS;
-    }
-
     private void move() {
+        //TODO refactor
+        if (maybeYes()) {
+            acceleration.set(pApplet.random(-1, 1), pApplet.random(-1, 1));
+        }
         velocity.add(acceleration);
-        velocity.limit(PLAYER_SPEED_LIMIT);
-        position.add(velocity);
-    }
-
-    private void show() {
-        pApplet.fill(EVIL_AI_COLOUR.v1, EVIL_AI_COLOUR.v2, EVIL_AI_COLOUR.v3);
-        pApplet.ellipse(position.x, position.y, PLAYER_RADIUS * 2, PLAYER_RADIUS * 2);
+        velocity.limit(3);
+        final PVector assumedPosition = new PVector().set(getPosition());
+        assumedPosition.add(velocity);
+        if (pApplet.width - (assumedPosition.x + radius) > 0
+                && assumedPosition.x - radius > 0
+                && assumedPosition.y - radius > 0
+                && pApplet.height - (assumedPosition.y + radius) > 0) {
+            getPosition().add(velocity);
+        }
     }
 
     void changeAcceleration(final int x, final int y) {

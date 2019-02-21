@@ -5,8 +5,8 @@ import com.rmw.machinelearning.model.Neuron;
 import processing.core.PVector;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 class NeuralNetwork {
 
@@ -18,7 +18,7 @@ class NeuralNetwork {
     private List<Connection> connections = new ArrayList<>();
 
     NeuralNetwork(final List<Float> weights) {
-        this.weights = weights;
+        this.weights = new LinkedList<>(weights);
         setupNeurons();
         setupConnections();
     }
@@ -59,7 +59,7 @@ class NeuralNetwork {
         inputNeurons.forEach(neuron -> neuron.setValue(0));
     }
 
-    private float getNeuronValue(final String name) {
+    float getNeuronValue(final String name) {
         final Neuron neuron = findNeuronByName(name);
         if (neuron != null) {
             return neuron.getValue();

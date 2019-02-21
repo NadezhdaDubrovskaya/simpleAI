@@ -2,6 +2,7 @@ package com.rmw.machinelearning;
 
 import processing.core.PApplet;
 
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_PLAYERS;
 import static com.rmw.machinelearning.Configuration.HEIGHT;
 import static com.rmw.machinelearning.Configuration.WIDTH;
 
@@ -20,7 +21,10 @@ public class Main extends PApplet {
     }
 
     public void setup() {
-        obstacles.setEvilAI(evilAI);
+        obstacles.addEvilAI(evilAI);
+        for (int i = 0; i < AMOUNT_OF_PLAYERS / 10; i++) {
+            obstacles.addEvilAI(new EvilAI(this));
+        }
     }
 
     public void draw() {

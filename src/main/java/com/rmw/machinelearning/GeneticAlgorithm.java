@@ -6,10 +6,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.rmw.machinelearning.Configuration.BEST_PLAYER_COLOR;
+import static com.rmw.machinelearning.Utility.maybeYes;
+import static java.lang.Math.round;
+
 class GeneticAlgorithm {
 
     private final PApplet pApplet;
     private List<Player> players;
+    private float bestScoreSoFar;
 
     GeneticAlgorithm(final PApplet p) {
         pApplet = p;
@@ -26,9 +31,22 @@ class GeneticAlgorithm {
     List<Player> getNextPopulation() {
 
         sortPlayerBasedOnFitnessFunction();
+        // in case the whole generation failed (instant death) - give them another chance
+        if (players.get(0).getFitnessScore() == 0) {
+            PApplet.println("Oops, bad luck. Let's try again");
+            final List<Player> copy = new ArrayList<>(players);
+            players.clear();
+            copy.forEach(player -> players.add(new Player(pApplet, player.getWeights())));
+            PApplet.println("Best score so far: " + bestScoreSoFar);
+            return players;
+        }
+        // else proceed with the algorithm
+        bestScoreSoFar = players.get(0).getFitnessScore();
         final List<Player> bestPlayers = new ArrayList<>(players.subList(0, Configuration.BREED_TOP_X_PLAYERS));
-        final List<Float> bestGenes = bestPlayers.get(0).exposeNeuronNetwork().getWeights();
-        PApplet.println("Best player has fitness score of " + bestPlayers.get(0).getFitnessScore());
+        final List<Float> bestGenes = bestPlayers.get(0).getWeights();
+        final Player bestPlayer = new Player(pApplet, bestGenes);
+        bestPlayer.colour = BEST_PLAYER_COLOR;
+        PApplet.println("Best score so far: " + bestScoreSoFar);
         PApplet.println("Best genes: " + bestGenes);
         players.clear();
 
@@ -47,10 +65,10 @@ class GeneticAlgorithm {
             mutateBabies(listOfAlreadyMutated);
             babiesMutated++;
         }
-        PApplet.print("Mutated: "  + babiesMutated);
+        PApplet.print("Mutated: " + babiesMutated);
         PApplet.print("Mutated indexes: " + listOfAlreadyMutated);
 
-        players.add(new Player(pApplet, bestGenes));
+        players.add(bestPlayer);
 
         return players;
     }
@@ -62,8 +80,8 @@ class GeneticAlgorithm {
 
     private void getBabies(final Player parent1, final Player parent2) {
         //copy the genes but do not modify the parent ones
-        final List<Float> genes1 = new ArrayList<>(parent1.exposeNeuronNetwork().getWeights());
-        final List<Float> genes2 = new ArrayList<>(parent2.exposeNeuronNetwork().getWeights());
+        final List<Float> genes1 = new ArrayList<>(parent1.getWeights());
+        final List<Float> genes2 = new ArrayList<>(parent2.getWeights());
         chromosomalCrossover(genes1, genes2);
         players.add(new Player(pApplet, genes1));
         players.add(new Player(pApplet, genes2));
@@ -75,10 +93,10 @@ class GeneticAlgorithm {
             randomIndex = getRandomIndex(players.size() - 1);
         }
         listOfAlreadyMutated.add(randomIndex);
-        final List<Float> genes = players.get(randomIndex).exposeNeuronNetwork().getWeights();
+        final List<Float> genes = players.get(randomIndex).getWeights();
         for (int i = 0; i < genes.size(); i++) {
             if (maybeYes()) {
-                genes.set(i, genes.get(i) * generateRandomWeight());
+                genes.set(i, generateRandomWeight());
             }
         }
     }
@@ -105,14 +123,10 @@ class GeneticAlgorithm {
     }
 
     private float generateRandomWeight() {
-        return pApplet.random(-1, 1);
+        return round(pApplet.random(-1, 1));
     }
 
     private int getRandomIndex(final int maxValue) {
         return (int) pApplet.random(maxValue);
-    }
-
-    private boolean maybeYes() {
-        return (int) pApplet.random(5) > 2;
     }
 }

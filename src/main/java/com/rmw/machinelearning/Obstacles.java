@@ -31,12 +31,14 @@ class Obstacles {
         screenObjects.forEach(ScreenObject::update);
     }
 
-    void setEvilAI(final EvilAI evilAI) {
+    void addEvilAI(final EvilAI evilAI) {
         screenObjects.add(evilAI);
     }
 
     private void setupWalls() {
-        //screenObjects.add(new Wall(pApplet, 100, 0, 50, 400));
+        screenObjects.add(new Wall(pApplet, 0, 300, 50, 50));
+        screenObjects.add(new Wall(pApplet, 150, 400, 50, 50));
+        screenObjects.add(new Wall(pApplet, 50, 550, 50, 50));
         screenObjects.add(new Wall(pApplet, 100, 500, 50, 300));
         screenObjects.add(new Wall(pApplet, 200, 0, 50, 600));
         screenObjects.add(new Wall(pApplet, 300, 100, 50, 700));

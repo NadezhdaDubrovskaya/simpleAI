@@ -6,93 +6,112 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.rmw.machinelearning.Configuration.BEST_PLAYER_COLOR;
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_HIDDEN_NEURONS;
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_INPUT_NEURONS;
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION;
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_OUTPUT_NEURONS;
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_PLAYERS;
+import static com.rmw.machinelearning.Configuration.Colour;
 import static com.rmw.machinelearning.Utility.maybeYes;
 import static java.lang.Math.round;
 
 class GeneticAlgorithm {
 
     private final PApplet pApplet;
-    private List<Player> players;
-    private float bestScoreSoFar;
+    private final List<Player> players = new ArrayList<>();
+    private int bestScoreSoFar;
 
     GeneticAlgorithm(final PApplet p) {
         pApplet = p;
     }
 
     List<Player> getInitialPopulation() {
-        players = new ArrayList<>();
-        for (int i = 0; i < Configuration.AMOUNT_OF_PLAYERS; i++) {
+        for (int i = 0; i < AMOUNT_OF_PLAYERS; i++) {
             players.add(new Player(pApplet, generateRandomWeights()));
         }
         return players;
     }
 
-    List<Player> getNextPopulation() {
+    void getNextPopulation() {
 
-        sortPlayerBasedOnFitnessFunction();
+        sortPlayerBasedOnTheirFitnessScore();
         // in case the whole generation failed (instant death) - give them another chance
         if (players.get(0).getFitnessScore() == 0) {
-            PApplet.println("Oops, bad luck. Let's try again");
-            final List<Player> copy = new ArrayList<>(players);
-            players.clear();
-            copy.forEach(player -> players.add(new Player(pApplet, player.getWeights())));
-            PApplet.println("Best score so far: " + bestScoreSoFar);
-            return players;
+            restartCurrentGeneration();
+            return;
+
         }
         // else proceed with the algorithm
-        bestScoreSoFar = players.get(0).getFitnessScore();
-        final List<Player> bestPlayers = new ArrayList<>(players.subList(0, Configuration.BREED_TOP_X_PLAYERS));
-        final List<Float> bestGenes = bestPlayers.get(0).getWeights();
-        final Player bestPlayer = new Player(pApplet, bestGenes);
-        bestPlayer.colour = BEST_PLAYER_COLOR;
-        PApplet.println("Best score so far: " + bestScoreSoFar);
-        PApplet.println("Best genes: " + bestGenes);
-        players.clear();
+        getStatistics();
+        breedTheBestOnes();
+        applyMutations();
+        getReadyForTheNextRound();
 
-        while (players.size() < Configuration.AMOUNT_OF_PLAYERS) {
-            final int randomIndex1 = getRandomIndex(Configuration.BREED_TOP_X_PLAYERS - 1);
-            int randomIndex2 = getRandomIndex(Configuration.BREED_TOP_X_PLAYERS - 1);
-            while (randomIndex1 == randomIndex2) {
-                randomIndex2 = getRandomIndex(Configuration.BREED_TOP_X_PLAYERS - 1);
-            }
-            getBabies(bestPlayers.get(randomIndex1), bestPlayers.get(randomIndex2));
-        }
-
-        int babiesMutated = 0;
-        final List<Integer> listOfAlreadyMutated = new ArrayList<>(Configuration.AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION);
-        while (babiesMutated < Configuration.AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION) {
-            mutateBabies(listOfAlreadyMutated);
-            babiesMutated++;
-        }
-        PApplet.print("Mutated: " + babiesMutated);
-        PApplet.print("Mutated indexes: " + listOfAlreadyMutated);
-
-        players.add(bestPlayer);
-
-        return players;
     }
 
-    private void sortPlayerBasedOnFitnessFunction() {
+    private void getReadyForTheNextRound() {
+        players.forEach(Player::reset);
+        int greenColorIntensity = 255;
+        for (final Player player : players) {
+            player.colour = new Colour(150, greenColorIntensity, 0);
+            if (greenColorIntensity > 0) {
+                greenColorIntensity--;
+            }
+        }
+    }
+
+    private void sortPlayerBasedOnTheirFitnessScore() {
         players.forEach(Player::calculateFitness);
         players.sort(Comparator.comparing(Player::getFitnessScore).reversed());
     }
 
-    private void getBabies(final Player parent1, final Player parent2) {
+    private void getStatistics() {
+        bestScoreSoFar = players.get(0).getFitnessScore();
+        final int totalFitnessScore = players.stream().mapToInt(Player::getFitnessScore).sum();
+        PApplet.println("Total fitness score of the whole generation: " + totalFitnessScore);
+        PApplet.println("Best score so far: " + bestScoreSoFar);
+        PApplet.println("Best genes: " + players.get(0).getWeights());
+    }
+
+    /**
+     * We do not create new player here but rather modify the genes of the existing ones
+     */
+    private void breedTheBestOnes() {
+        final int middleIndex = players.size() / 4 + 1;
+        for (int i = 0, j = middleIndex; i < middleIndex && j < players.size(); i++, j++) {
+            final List<Float> newGenes = getBabyGenes(players.get(i), players.get(i + 1));
+            players.get(j).changeWeights(newGenes);
+        }
+    }
+
+    private List<Float> getBabyGenes(final Player parent1, final Player parent2) {
         //copy the genes but do not modify the parent ones
         final List<Float> genes1 = new ArrayList<>(parent1.getWeights());
         final List<Float> genes2 = new ArrayList<>(parent2.getWeights());
         chromosomalCrossover(genes1, genes2);
-        players.add(new Player(pApplet, genes1));
-        players.add(new Player(pApplet, genes2));
+        return genes1;
     }
 
-    private void mutateBabies(final List<Integer> listOfAlreadyMutated) {
-        int randomIndex = getRandomIndex(players.size() - 1);
-        while (listOfAlreadyMutated.contains(randomIndex)) {
-            randomIndex = getRandomIndex(players.size() - 1);
+    private void chromosomalCrossover(final List<Float> parent1Genes, final List<Float> parent2Genes) {
+        for (int i = 0; i < parent1Genes.size(); i++) {
+            //replace random genes of parent1 with corresponding gene of parent2
+            if (maybeYes()) {
+                parent1Genes.set(i, parent2Genes.get(i));
+            }
         }
-        listOfAlreadyMutated.add(randomIndex);
+    }
+
+    private void applyMutations() {
+        int babiesMutated = 0;
+        while (babiesMutated < AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION) {
+            mutateBabies();
+            babiesMutated++;
+        }
+        PApplet.println("Mutated: " + babiesMutated);
+    }
+
+    private void mutateBabies() {
+        final int randomIndex = round(pApplet.random(players.size() >> 2, players.size() - 1));
         final List<Float> genes = players.get(randomIndex).getWeights();
         for (int i = 0; i < genes.size(); i++) {
             if (maybeYes()) {
@@ -101,21 +120,18 @@ class GeneticAlgorithm {
         }
     }
 
-    private void chromosomalCrossover(final List<Float> parent1Genes, final List<Float> parent2Genes) {
-        for (int i = 0; i < parent1Genes.size(); i++) {
-            //swap random genes
-            if (maybeYes()) {
-                final float temp = parent1Genes.get(i);
-                parent1Genes.set(i, parent2Genes.get(i));
-                parent2Genes.set(i, temp);
-            }
-        }
+    private void restartCurrentGeneration() {
+        PApplet.println("Oops, bad luck. Let's try again");
+        final List<Player> copy = new ArrayList<>(players);
+        players.clear();
+        copy.forEach(player -> players.add(new Player(pApplet, player.getWeights())));
+        PApplet.println("Best score so far: " + bestScoreSoFar);
     }
 
     private List<Float> generateRandomWeights() {
         final List<Float> result = new ArrayList<>();
-        int weightsAmount = Configuration.AMOUNT_OF_INPUT_NEURONS * Configuration.AMOUNT_OF_HIDDEN_NEURONS;
-        weightsAmount += Configuration.AMOUNT_OF_HIDDEN_NEURONS * Configuration.AMOUNT_OF_OUTPUT_NEURONS;
+        int weightsAmount = AMOUNT_OF_INPUT_NEURONS * AMOUNT_OF_HIDDEN_NEURONS;
+        weightsAmount += AMOUNT_OF_HIDDEN_NEURONS * AMOUNT_OF_OUTPUT_NEURONS;
         for (int i = 0; i < weightsAmount; i++) {
             result.add(generateRandomWeight());
         }
@@ -124,9 +140,5 @@ class GeneticAlgorithm {
 
     private float generateRandomWeight() {
         return round(pApplet.random(-1, 1));
-    }
-
-    private int getRandomIndex(final int maxValue) {
-        return (int) pApplet.random(maxValue);
     }
 }

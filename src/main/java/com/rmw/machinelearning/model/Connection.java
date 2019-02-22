@@ -5,7 +5,7 @@ public class Connection {
     private final String name;
     private final String from;
     private final String to;
-    private final float weight;
+    private float weight;
 
     public Connection(final String from, final String to, final float weight) {
         name = from + to;
@@ -28,5 +28,9 @@ public class Connection {
 
     public float getWeight() {
         return weight;
+    }
+
+    public void setWeight(final float weight) {
+        this.weight = weight;
     }
 }

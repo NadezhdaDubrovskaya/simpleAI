@@ -11,11 +11,11 @@ import java.util.List;
 class NeuralNetwork {
 
     private final List<Neuron> neurons = new ArrayList<>();
-    private final List<Float> weights;
     private final List<Neuron> inputNeurons = new ArrayList<>();
     private final List<Neuron> hiddenNeurons = new ArrayList<>();
     private final List<Neuron> outputNeurons = new ArrayList<>();
-    private List<Connection> connections = new ArrayList<>();
+    private final List<Connection> connections = new ArrayList<>();
+    private List<Float> weights;
 
     NeuralNetwork(final List<Float> weights) {
         this.weights = new LinkedList<>(weights);
@@ -38,12 +38,19 @@ class NeuralNetwork {
         });
         final float x = getNeuronValue("O1");
         final float y = getNeuronValue("O2");
-        inputNeurons.forEach(neuron -> neuron.setValue(0));
+        clearInputs();
         return new PVector(x, y);
     }
 
     List<Float> getWeights() {
         return weights;
+    }
+
+    void setWeights(final List<Float> weights) {
+        this.weights = weights;
+        for (int i = 0; i < connections.size(); i++) {
+            connections.get(i).setWeight(weights.get(i));
+        }
     }
 
     void setInputNeuron(final String name, final float value) {
@@ -91,7 +98,6 @@ class NeuralNetwork {
     }
 
     private void setupConnections() {
-        connections = new ArrayList<>();
         int weightIndex = 0;
         for (final Neuron neuron : neurons) {
             if (neuron.getType() == NeuronType.Input) {

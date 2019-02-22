@@ -19,18 +19,25 @@ import static com.rmw.machinelearning.DistanceUtil.calculateDistance;
 class Player extends CircularObject {
 
     private final NeuralNetwork neuralNetwork;
-    private final PVector velocity;
-    private PVector acceleration;
+    private final PVector velocity = new PVector();
+    private final PVector acceleration = new PVector();
     private boolean dead;
     private int survivedForXMoves;
-    private float fitnessScore;
+    private int fitnessScore;
 
     Player(final PApplet p, final List<Float> weights) {
         super(p);
-        getPosition().set(PLAYER_START_POSITION.x, PLAYER_START_POSITION.y);
-        acceleration = new PVector(0, 0);
-        velocity = new PVector(0, 0);
         neuralNetwork = new NeuralNetwork(weights);
+        reset();
+    }
+
+    @Override
+    void reset() {
+        fitnessScore = 0;
+        dead = false;
+        getPosition().set(PLAYER_START_POSITION.x, PLAYER_START_POSITION.y);
+        velocity.set(0, 0);
+        acceleration.set(0, 0);
         colour = PLAYER_COLOR;
     }
 
@@ -44,19 +51,20 @@ class Player extends CircularObject {
         }
     }
 
-    float getFitnessScore() {
+    int getFitnessScore() {
         return fitnessScore;
     }
 
     void calculateFitness() {
-        if (!dead) {
-            fitnessScore += 100;
-        }
-        fitnessScore += survivedForXMoves;
+        fitnessScore = survivedForXMoves;
     }
 
     List<Float> getWeights() {
         return neuralNetwork.getWeights();
+    }
+
+    void changeWeights(final List<Float> weights) {
+        neuralNetwork.setWeights(weights);
     }
 
     private void look() {
@@ -81,15 +89,17 @@ class Player extends CircularObject {
             }
         }
 
-        neuralNetwork.setInputNeuron(Direction.BIAS.getCode(), 1); //bias neuron always returns 1
+        //bias neuron always returns 1
+        neuralNetwork.setInputNeuron(Direction.BIAS.getCode(), 1);
 
     }
 
     private void think() {
         final PVector reaction = neuralNetwork.react();
         if (reaction.x != 0 || reaction.y != 0) {
-            acceleration = reaction;
+            acceleration.set(reaction.x, reaction.y);
         } else {
+            //if there are no signals from the brain - stop moving
             acceleration.set(0, 0);
             velocity.set(0, 0);
         }

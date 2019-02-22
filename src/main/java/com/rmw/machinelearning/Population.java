@@ -9,30 +9,35 @@ import static java.text.MessageFormat.format;
 class Population {
 
     private static final String NEW_GENERATION_READY = "Generation {0} is ready and contains {1} players";
-    private static final String EACH_PLAYER_ALLOWED_STEPS = "Each player has {0} steps allowed to make";
+    private static final int MAX_UPDATES = 5000;
 
+    private final Obstacles obstacles;
     private final GeneticAlgorithm geneticAlgorithm;
-    private List<Player> players;
+    private final List<Player> players;
     private int generationCounter;
     private int currentUpdate;
 
     Population(final PApplet pApplet) {
         geneticAlgorithm = new GeneticAlgorithm(pApplet);
         players = geneticAlgorithm.getInitialPopulation();
+        obstacles = Obstacles.getInstance(pApplet);
     }
 
     void update() {
         players.forEach(Player::update);
         // recreate the population if necessary (all are dead or ran out of steps)
-        if (players.stream().allMatch(Player::isDead)) {
-            currentUpdate = 0;
+        if (players.stream().allMatch(Player::isDead) || currentUpdate == MAX_UPDATES) {
+            // when AIs start doing good - introduce new enemy :)
+            if (currentUpdate == MAX_UPDATES) {
+                obstacles.addEvilAI();
+            }
             generationCounter++;
-
-            players = geneticAlgorithm.getNextPopulation();
+            currentUpdate = 0;
+            geneticAlgorithm.getNextPopulation();
+            obstacles.getObstacles().forEach(ScreenObject::reset);
             PApplet.println(format(NEW_GENERATION_READY, generationCounter, players.size()));
-        } else {
-            currentUpdate++;
         }
+        currentUpdate++;
     }
 
 }

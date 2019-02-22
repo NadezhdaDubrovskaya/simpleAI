@@ -7,7 +7,9 @@ class Configuration {
     static final int WIDTH = 800;
     static final int HEIGHT = 800;
 
-    static final int AMOUNT_OF_PLAYERS = 500;
+    //genetic algorithm
+    static final int AMOUNT_OF_PLAYERS = 500; //should be even number and at least 4
+    static final int AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION = AMOUNT_OF_PLAYERS / 10;
 
     static final PVector PLAYER_START_POSITION = new PVector(50, 50);
     static final Colour PLAYER_COLOR = new Colour(255, 255, 0);
@@ -19,11 +21,6 @@ class Configuration {
     static final int AMOUNT_OF_INPUT_NEURONS = 5;
     static final int AMOUNT_OF_HIDDEN_NEURONS = 5;
     static final int AMOUNT_OF_OUTPUT_NEURONS = 2;
-
-    //genetic algorithm
-    static final int BREED_TOP_X_PLAYERS = 10;
-    static final int AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION = AMOUNT_OF_PLAYERS / 10;
-
 
     static class Colour {
 

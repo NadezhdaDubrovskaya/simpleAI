@@ -4,7 +4,6 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 import static com.rmw.machinelearning.Configuration.HEIGHT;
-import static com.rmw.machinelearning.Configuration.PLAYER_SPEED_LIMIT;
 import static com.rmw.machinelearning.Configuration.WIDTH;
 import static com.rmw.machinelearning.Utility.maybeYes;
 

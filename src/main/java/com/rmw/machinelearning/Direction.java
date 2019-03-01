@@ -1,22 +1,21 @@
 package com.rmw.machinelearning;
 
-//TODO for input neurons make another enum. This is going to be only direction enum
 public enum Direction {
 
-    RIGHT("I1"),
-    LEFT("I2"),
-    TOP("I3"),
-    BOTTOM("I4"),
-    BIAS("I5");
+    RIGHT(0),
+    LEFT(1),
+    TOP(2),
+    BOTTOM(3),
+    BIAS(3);
 
-    private final String inputNeuron;
+    private final int neuronIndex;
 
-    Direction(final String inputNeuron) {
-        this.inputNeuron = inputNeuron;
+    Direction(final int neuronIndex) {
+        this.neuronIndex = neuronIndex;
     }
 
-    public String getCode() {
-        return inputNeuron;
+    public int getIndex() {
+        return neuronIndex;
     }
 
 }

@@ -5,6 +5,9 @@ import processing.core.PApplet;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.rmw.machinelearning.Configuration.HEIGHT;
+import static com.rmw.machinelearning.Configuration.WIDTH;
+
 class Obstacles {
 
     private static Obstacles instance;
@@ -13,6 +16,11 @@ class Obstacles {
 
     private Obstacles(final PApplet pApplet) {
         this.pApplet = pApplet;
+        //add screen borders
+        screenObjects.add(new Wall(pApplet, 0, 0, WIDTH, 1));
+        screenObjects.add(new Wall(pApplet, 0, 0, 1, HEIGHT));
+        screenObjects.add(new Wall(pApplet, WIDTH, 0, 1, HEIGHT));
+        screenObjects.add(new Wall(pApplet, 0, HEIGHT, WIDTH, 1));
         setupWalls();
     }
 

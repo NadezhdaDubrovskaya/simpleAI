@@ -8,17 +8,16 @@ public class Neuron {
     private NeuronType type;
     private float value;
 
-    public Neuron(final String neuronName, final NeuronType type) {
-        name = neuronName;
+    public Neuron(final NeuronType type) {
         this.type = type;
-    }
-
-    public void setValue (final float value) {
-        this.value = value;
     }
 
     public float getValue() {
         return value;
+    }
+
+    public void setValue(final float value) {
+        this.value = value;
     }
 
     public String getName() {

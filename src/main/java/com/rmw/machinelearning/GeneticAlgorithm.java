@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.rmw.machinelearning.Configuration.AMOUNT_OF_HIDDEN_NEURONS;
+import static com.rmw.machinelearning.Configuration.AMOUNT_OF_CONNECTIONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_INPUT_NEURONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_OUTPUT_NEURONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_PLAYERS;
 import static com.rmw.machinelearning.Configuration.Colour;
+import static com.rmw.machinelearning.Configuration.HIDDEN_LAYERS_CONFIGURATION;
 import static com.rmw.machinelearning.Utility.maybeYes;
 import static java.lang.Math.round;
 
@@ -36,17 +37,16 @@ class GeneticAlgorithm {
 
         sortPlayerBasedOnTheirFitnessScore();
         // in case the whole generation failed (instant death) - give them another chance
+        // this can happen if evil AI is located at the respawn location
         if (players.get(0).getFitnessScore() == 0) {
             restartCurrentGeneration();
             return;
-
         }
         // else proceed with the algorithm
         getStatistics();
         breedTheBestOnes();
         applyMutations();
         getReadyForTheNextRound();
-
     }
 
     private void getReadyForTheNextRound() {
@@ -130,9 +130,7 @@ class GeneticAlgorithm {
 
     private List<Float> generateRandomWeights() {
         final List<Float> result = new ArrayList<>();
-        int weightsAmount = AMOUNT_OF_INPUT_NEURONS * AMOUNT_OF_HIDDEN_NEURONS;
-        weightsAmount += AMOUNT_OF_HIDDEN_NEURONS * AMOUNT_OF_OUTPUT_NEURONS;
-        for (int i = 0; i < weightsAmount; i++) {
+        for (int i = 0; i < AMOUNT_OF_CONNECTIONS; i++) {
             result.add(generateRandomWeight());
         }
         return result;

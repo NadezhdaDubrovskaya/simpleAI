@@ -2,27 +2,21 @@ package com.rmw.machinelearning.model;
 
 public class Connection {
 
-    private final String name;
-    private final String from;
-    private final String to;
+    private final Neuron from;
+    private final Neuron to;
     private float weight;
 
-    public Connection(final String from, final String to, final float weight) {
-        name = from + to;
+    public Connection(final Neuron from, final Neuron to, final float weight) {
         this.from = from;
         this.to = to;
         this.weight = weight;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getFrom() {
+    public Neuron getFrom() {
         return from;
     }
 
-    public String getTo() {
+    public Neuron getTo() {
         return to;
     }
 

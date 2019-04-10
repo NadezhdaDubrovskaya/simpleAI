@@ -32,7 +32,9 @@ public class Main extends PApplet {
     public void draw() {
         background(0, 0, 255);
         obstacles.update();
-        //population.update();
+        if (IS_AI_MODE) {
+            population.update();
+        }
     }
 }
 

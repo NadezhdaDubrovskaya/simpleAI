@@ -5,8 +5,14 @@ class Neuron {
     private String name;
     private NeuronType type;
     private float value;
+    private int layer; // used for hidden neurons
 
     Neuron(final NeuronType type) {
+        this.type = type;
+    }
+
+    Neuron(final String name, final NeuronType type) {
+        this.name = name;
         this.type = type;
     }
 
@@ -24,5 +30,13 @@ class Neuron {
 
     NeuronType getType() {
         return type;
+    }
+
+    int getLayer() {
+        return layer;
+    }
+
+    void setLayer(final int layer) {
+        this.layer = layer;
     }
 }

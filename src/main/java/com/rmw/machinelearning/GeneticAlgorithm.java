@@ -7,12 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_CONNECTIONS;
-import static com.rmw.machinelearning.Configuration.AMOUNT_OF_INPUT_NEURONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION;
-import static com.rmw.machinelearning.Configuration.AMOUNT_OF_OUTPUT_NEURONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_PLAYERS;
-import static com.rmw.machinelearning.Configuration.Colour;
-import static com.rmw.machinelearning.Configuration.HIDDEN_LAYERS_CONFIGURATION;
 import static com.rmw.machinelearning.Utility.maybeYes;
 import static java.lang.Math.round;
 
@@ -53,7 +49,7 @@ class GeneticAlgorithm {
         players.forEach(Player::reset);
         int greenColorIntensity = 255;
         for (final Player player : players) {
-            player.colour = new Colour(150, greenColorIntensity, 0);
+            player.setColour(150, greenColorIntensity, 0);
             if (greenColorIntensity > 0) {
                 greenColorIntensity--;
             }

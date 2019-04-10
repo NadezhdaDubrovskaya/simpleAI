@@ -13,8 +13,8 @@ abstract class RectangularObject extends ScreenObject {
 
     @Override
     void show() {
-        pApplet.fill(colour.v1, colour.v2, colour.v3);
-        pApplet.rect(getPosition().x, getPosition().y, width, height);
+        getPApplet().fill(getColour().v1, getColour().v2, getColour().v3);
+        getPApplet().rect(getPosition().x, getPosition().y, width, height);
     }
 
     @Override

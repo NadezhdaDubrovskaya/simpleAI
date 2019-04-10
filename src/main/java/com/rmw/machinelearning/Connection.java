@@ -1,4 +1,4 @@
-package com.rmw.machinelearning.model;
+package com.rmw.machinelearning;
 
 public class Connection {
 

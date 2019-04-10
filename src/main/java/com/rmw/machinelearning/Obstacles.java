@@ -40,23 +40,30 @@ class Obstacles {
     }
 
     void addEvilAI() {
-        screenObjects.add(new EvilAI(pApplet));
+        screenObjects.add(new Monster(pApplet));
     }
 
     private void setupWalls() {
-        screenObjects.add(new Wall(pApplet, 0, 300, 50, 50));
-        screenObjects.add(new Wall(pApplet, 150, 400, 50, 50));
-        screenObjects.add(new Wall(pApplet, 50, 550, 50, 50));
-        screenObjects.add(new Wall(pApplet, 100, 500, 50, 50));
-        screenObjects.add(new Wall(pApplet, 200, 0, 50, 50));
-        screenObjects.add(new Wall(pApplet, 300, 100, 50, 200));
-        screenObjects.add(new Wall(pApplet, 400, 0, 50, 50));
-        screenObjects.add(new Wall(pApplet, 400, 300, 50, 50));
-        screenObjects.add(new Wall(pApplet, 500, 500, 100, 50));
-        screenObjects.add(new Wall(pApplet, 500, 0, 50, 50));
-        screenObjects.add(new Wall(pApplet, 600, 0, 50, 150));
-        screenObjects.add(new Wall(pApplet, 700, 0, 50, 50));
-        screenObjects.add(new Wall(pApplet, 700, 300, 50, 50));
+        screenObjects.add(new Wall(pApplet, 0, 0, 10, HEIGHT));
+        screenObjects.add(new Wall(pApplet, 0, 0, WIDTH, 10));
+        screenObjects.add(new Wall(pApplet, WIDTH-10, 0, 10, HEIGHT));
+        screenObjects.add(new Wall(pApplet, 0, HEIGHT-10, WIDTH, 10));
+        screenObjects.add(new Wall(pApplet, 100, 50, 200, 50));
+        screenObjects.add(new Wall(pApplet, 100, 100, 50, 50));
+        screenObjects.add(new Wall(pApplet, 200, 250, 50, 300));
+        screenObjects.add(new Wall(pApplet, 250, 650, 50, 150));
+        screenObjects.add(new Wall(pApplet, 300, 200, 250, 50));
+        screenObjects.add(new Wall(pApplet, 300, 250, 50, 50));
+        screenObjects.add(new Wall(pApplet, 350, 700, 50, 100));
+        screenObjects.add(new Wall(pApplet, 400, 450, 50, 200));
+        screenObjects.add(new Wall(pApplet, 500, 50, 250, 50));
+        screenObjects.add(new Wall(pApplet, 500, 300, 50, 100));
+        screenObjects.add(new Wall(pApplet, 500, 450, 150, 50));
+        screenObjects.add(new Wall(pApplet, 500, 500, 50, 100));
+        screenObjects.add(new Wall(pApplet, 500, 650, 50, 150));
+        screenObjects.add(new Wall(pApplet, 600, 350, 50, 150));
+        screenObjects.add(new Wall(pApplet, 650, 650, 100, 50));
+        screenObjects.add(new Wall(pApplet, 700, 100, 50, 500));
     }
 
 }

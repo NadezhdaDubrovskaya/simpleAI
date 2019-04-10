@@ -1,7 +1,5 @@
 package com.rmw.machinelearning;
 
-import com.rmw.machinelearning.model.Connection;
-import com.rmw.machinelearning.model.Neuron;
 import processing.core.PVector;
 
 import java.util.LinkedList;
@@ -19,7 +17,7 @@ import static com.rmw.machinelearning.NeuronType.Output;
 class NeuralNetwork {
 
     private final Neuron biasNeuron = new Neuron(Bias);
-    private final List<List<Neuron>> neurons = new LinkedList<>();
+    private final List<List<Neuron>> neuronLayers = new LinkedList<>();
     private final List<Connection> connections = new LinkedList<>();
     private List<Float> weights;
 
@@ -32,10 +30,10 @@ class NeuralNetwork {
 
     PVector react() {
         //skip input layer
-        for (int i = 1; i < neurons.size(); i++) {
-            neurons.get(i).forEach(neuron -> neuron.setValue(0));
+        for (int i = 1; i < neuronLayers.size(); i++) {
+            neuronLayers.get(i).forEach(neuron -> neuron.setValue(0));
         }
-        final List<Neuron> outputLayer = neurons.get(neurons.size() - 1);
+        final List<Neuron> outputLayer = neuronLayers.get(neuronLayers.size() - 1);
         outputLayer.forEach(this::calculateNeuronValue);
         return new PVector(outputLayer.get(0).getValue(), outputLayer.get(1).getValue());
     }
@@ -68,7 +66,7 @@ class NeuralNetwork {
     }
 
     void setInputs(final Vision vision) {
-        final List<Neuron> inputNeurons = neurons.get(0);
+        final List<Neuron> inputNeurons = neuronLayers.get(0);
         vision.getSides().forEach((direction, value) ->
                 inputNeurons.get(direction.getIndex()).setValue(value));
     }
@@ -84,14 +82,14 @@ class NeuralNetwork {
         for (int i = 0; i < size; i++) {
             group.add(new Neuron(type));
         }
-        neurons.add(group);
+        neuronLayers.add(group);
     }
 
     private void setupConnections() {
         int weightIndex = 0;
-        for (int i = 0; i < neurons.size() - 1; i++) {
-            final List<Neuron> currentGroup = neurons.get(i);
-            final List<Neuron> nextGroup = neurons.get(i + 1);
+        for (int i = 0; i < neuronLayers.size() - 1; i++) {
+            final List<Neuron> currentGroup = neuronLayers.get(i);
+            final List<Neuron> nextGroup = neuronLayers.get(i + 1);
             weightIndex = createConnectionsBetweenGroups(currentGroup, nextGroup, weightIndex);
         }
     }

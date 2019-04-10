@@ -7,16 +7,34 @@ import static com.rmw.machinelearning.Configuration.Colour;
 
 abstract class ScreenObject {
 
-    final PApplet pApplet;
+    private final PApplet pApplet;
     private final PVector position = new PVector();
-    Colour colour = new Colour(0, 0, 0);
+    private Colour colour = new Colour(0, 0, 0);
 
     ScreenObject(final PApplet pApplet) {
         this.pApplet = pApplet;
     }
 
+    PApplet getPApplet() {
+        return pApplet;
+    }
+
     PVector getPosition() {
         return position;
+    }
+
+    Colour getColour() {
+        return colour;
+    }
+
+    void setColour(final Colour colour) {
+        this.colour = colour;
+    }
+
+    void setColour(final int v1, final int v2, final int v3) {
+        colour.v1 = v1;
+        colour.v2 = v2;
+        colour.v3 = v3;
     }
 
     void reset() {

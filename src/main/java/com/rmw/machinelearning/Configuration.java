@@ -7,6 +7,12 @@ import java.util.List;
 
 class Configuration {
 
+    /**
+     * If false then it will behave as a regular game and player will be given an opportunity to run and avoid AIs
+     * If true then it means the game is in the mode of teaching AIs
+     */
+    static final boolean IS_AI_MODE = false;
+
     static final int WIDTH = 800;
     static final int HEIGHT = 800;
 
@@ -20,15 +26,14 @@ class Configuration {
     static final int PLAYER_SPEED_LIMIT = 5;
 
     static final int DISTANCE_THRESHOLD = 50;
-
-    static int AMOUNT_OF_CONNECTIONS;
     static final List<Integer> HIDDEN_LAYERS_CONFIGURATION = Arrays.asList(3);
     static final int AMOUNT_OF_INPUT_NEURONS = 4; // do not change
     static final int AMOUNT_OF_OUTPUT_NEURONS = 2; //do not change
+    static int AMOUNT_OF_CONNECTIONS;
 
     static {
         // main connections
-        if (HIDDEN_LAYERS_CONFIGURATION.size() != 0) {
+        if (!HIDDEN_LAYERS_CONFIGURATION.isEmpty()) {
             AMOUNT_OF_CONNECTIONS = AMOUNT_OF_INPUT_NEURONS * HIDDEN_LAYERS_CONFIGURATION.get(0);
             if (HIDDEN_LAYERS_CONFIGURATION.size() > 1) {
                 for (int i = 0; i < HIDDEN_LAYERS_CONFIGURATION.size() - 1; i++) {
@@ -46,9 +51,9 @@ class Configuration {
 
     static class Colour {
 
-        final int v1;
-        final int v2;
-        final int v3;
+        int v1;
+        int v2;
+        int v3;
 
         Colour(final int v1, final int v2, final int v3) {
             this.v1 = v1;

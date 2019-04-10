@@ -5,8 +5,6 @@ import processing.core.PVector;
 
 import java.util.List;
 
-import static com.rmw.machinelearning.Configuration.Colour;
-import static com.rmw.machinelearning.Configuration.DISTANCE_THRESHOLD;
 import static com.rmw.machinelearning.Configuration.PLAYER_COLOR;
 import static com.rmw.machinelearning.Configuration.PLAYER_SPEED_LIMIT;
 import static com.rmw.machinelearning.Configuration.PLAYER_START_POSITION;
@@ -36,7 +34,7 @@ class Player extends CircularObject {
         dead = false;
         survivedForXMoves = 0;
         fitnessScore = 0;
-        colour = PLAYER_COLOR;
+        setColour(PLAYER_COLOR);
     }
 
     @Override
@@ -66,9 +64,8 @@ class Player extends CircularObject {
     }
 
     private void look() {
-
         vision.reset();
-        for (final ScreenObject obstacle : Obstacles.getInstance(pApplet).getObstacles()) {
+        for (final ScreenObject obstacle : Obstacles.getInstance(getPApplet()).getObstacles()) {
             final Side side = calculateDistance(this, obstacle);
             if (side != null) {
                 checkThreshold(side);
@@ -106,16 +103,13 @@ class Player extends CircularObject {
         final float dist = side.getDistance();
         if (dist <= 0) {
             dead = true;
-            colour = new Colour(150, 150, 150);
+            setColour(150, 150, 150);
             return;
         }
-        if (dist < DISTANCE_THRESHOLD) {
-            final float newNeuronValue = 1 / dist;
-            //update input value only in case the new object is closer
-            if (newNeuronValue > vision.get(direction)) {
-                vision.put(direction, newNeuronValue);
-            }
+        final float newNeuronValue = 100 / dist;
+        //update input value only in case the new object is closer
+        if (newNeuronValue > vision.get(direction)) {
+            vision.put(direction, newNeuronValue);
         }
     }
-
 }

@@ -4,16 +4,24 @@ import processing.core.PApplet;
 
 abstract class CircularObject extends ScreenObject {
 
-    int radius = 10;
+    private int radius = 10;
 
     CircularObject(final PApplet pApplet) {
         super(pApplet);
     }
 
+    void setRadius(final int radius) {
+        this.radius = radius;
+    }
+
+    int getRadius() {
+        return radius;
+    }
+
     @Override
     void show() {
-        pApplet.fill(colour.v1, colour.v2, colour.v3);
-        pApplet.ellipse(getPosition().x, getPosition().y, radius * 2, radius * 2);
+        getPApplet().fill(getColour().v1, getColour().v2, getColour().v3);
+        getPApplet().ellipse(getPosition().x, getPosition().y, radius * 2, radius * 2);
     }
 
     @Override

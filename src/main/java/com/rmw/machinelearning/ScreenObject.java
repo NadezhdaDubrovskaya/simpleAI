@@ -19,6 +19,11 @@ abstract class ScreenObject {
         return pApplet;
     }
 
+    void setPosition(final float x, final float y) {
+        position.x = x;
+        position.y = y;
+    }
+
     PVector getPosition() {
         return position;
     }

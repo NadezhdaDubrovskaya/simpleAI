@@ -15,18 +15,18 @@ import static java.lang.Math.round;
 class GeneticAlgorithm {
 
     private final PApplet pApplet;
-    private final List<Player> players = new ArrayList<>();
+    private final List<ComputerPlayer> computerPlayers = new ArrayList<>();
     private int bestScoreSoFar;
 
     GeneticAlgorithm(final PApplet p) {
         pApplet = p;
     }
 
-    List<Player> getInitialPopulation() {
+    List<ComputerPlayer> getInitialPopulation() {
         for (int i = 0; i < AMOUNT_OF_PLAYERS; i++) {
-            players.add(new Player(pApplet, generateRandomWeights()));
+            computerPlayers.add(new ComputerPlayer(pApplet, generateRandomWeights()));
         }
-        return players;
+        return computerPlayers;
     }
 
     void getNextPopulation() {
@@ -34,7 +34,7 @@ class GeneticAlgorithm {
         sortPlayerBasedOnTheirFitnessScore();
         // in case the whole generation failed (instant death) - give them another chance
         // this can happen if evil AI is located at the respawn location
-        if (players.get(0).getFitnessScore() == 0) {
+        if (computerPlayers.get(0).getFitnessScore() == 0) {
             restartCurrentGeneration();
             return;
         }
@@ -46,10 +46,10 @@ class GeneticAlgorithm {
     }
 
     private void getReadyForTheNextRound() {
-        players.forEach(Player::reset);
+        computerPlayers.forEach(ComputerPlayer::reset);
         int greenColorIntensity = 255;
-        for (final Player player : players) {
-            player.setColour(150, greenColorIntensity, 0);
+        for (final ComputerPlayer computerPlayer : computerPlayers) {
+            computerPlayer.setColour(150, greenColorIntensity, 0);
             if (greenColorIntensity > 0) {
                 greenColorIntensity--;
             }
@@ -57,30 +57,30 @@ class GeneticAlgorithm {
     }
 
     private void sortPlayerBasedOnTheirFitnessScore() {
-        players.forEach(Player::calculateFitness);
-        players.sort(Comparator.comparing(Player::getFitnessScore).reversed());
+        computerPlayers.forEach(ComputerPlayer::calculateFitness);
+        computerPlayers.sort(Comparator.comparing(ComputerPlayer::getFitnessScore).reversed());
     }
 
     private void getStatistics() {
-        bestScoreSoFar = players.get(0).getFitnessScore();
-        final int totalFitnessScore = players.stream().mapToInt(Player::getFitnessScore).sum();
+        bestScoreSoFar = computerPlayers.get(0).getFitnessScore();
+        final int totalFitnessScore = computerPlayers.stream().mapToInt(ComputerPlayer::getFitnessScore).sum();
         PApplet.println("Total fitness score of the whole generation: " + totalFitnessScore);
         PApplet.println("Best score so far: " + bestScoreSoFar);
-        PApplet.println("Best genes: " + players.get(0).getWeights());
+        PApplet.println("Best genes: " + computerPlayers.get(0).getWeights());
     }
 
     /**
      * We do not create new player here but rather modify the genes of the existing ones
      */
     private void breedTheBestOnes() {
-        final int middleIndex = players.size() / 4 + 1;
-        for (int i = 0, j = middleIndex; i < middleIndex && j < players.size(); i++, j++) {
-            final List<Float> newGenes = getBabyGenes(players.get(i), players.get(i + 1));
-            players.get(j).changeWeights(newGenes);
+        final int middleIndex = computerPlayers.size() / 4 + 1;
+        for (int i = 0, j = middleIndex; i < middleIndex && j < computerPlayers.size(); i++, j++) {
+            final List<Float> newGenes = getBabyGenes(computerPlayers.get(i), computerPlayers.get(i + 1));
+            computerPlayers.get(j).changeWeights(newGenes);
         }
     }
 
-    private List<Float> getBabyGenes(final Player parent1, final Player parent2) {
+    private List<Float> getBabyGenes(final ComputerPlayer parent1, final ComputerPlayer parent2) {
         //copy the genes but do not modify the parent ones
         final List<Float> genes1 = new ArrayList<>(parent1.getWeights());
         final List<Float> genes2 = new ArrayList<>(parent2.getWeights());
@@ -107,8 +107,8 @@ class GeneticAlgorithm {
     }
 
     private void mutateBabies() {
-        final int randomIndex = round(pApplet.random(players.size() >> 2, players.size() - 1));
-        final List<Float> genes = players.get(randomIndex).getWeights();
+        final int randomIndex = round(pApplet.random(computerPlayers.size() >> 2, computerPlayers.size() - 1));
+        final List<Float> genes = computerPlayers.get(randomIndex).getWeights();
         for (int i = 0; i < genes.size(); i++) {
             if (maybeYes()) {
                 genes.set(i, generateRandomWeight());
@@ -118,9 +118,9 @@ class GeneticAlgorithm {
 
     private void restartCurrentGeneration() {
         PApplet.println("Oops, bad luck. Let's try again");
-        final List<Player> copy = new ArrayList<>(players);
-        players.clear();
-        copy.forEach(player -> players.add(new Player(pApplet, player.getWeights())));
+        final List<ComputerPlayer> copy = new ArrayList<>(computerPlayers);
+        computerPlayers.clear();
+        copy.forEach(computerPlayer -> computerPlayers.add(new ComputerPlayer(pApplet, computerPlayer.getWeights())));
         PApplet.println("Best score so far: " + bestScoreSoFar);
     }
 

@@ -39,4 +39,9 @@ class Neuron {
     void setLayer(final int layer) {
         this.layer = layer;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

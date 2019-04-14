@@ -3,11 +3,19 @@ package com.rmw.machinelearning;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
+import org.jgrapht.traverse.DepthFirstIterator;
 import processing.core.PVector;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.StringWriter;
+import java.io.Writer;
+import java.rmi.server.ExportException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.jgrapht.*;
+import org.jgrapht.graph.*;
 
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_INPUT_NEURONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_OUTPUT_NEURONS;
@@ -31,6 +39,15 @@ class NeuralNetwork {
         this.weights = weights;
         setupNeurons();
         setupConnections();
+
+        Iterator<Neuron> iter = new DepthFirstIterator<>(network);
+        while (iter.hasNext()) {
+            Neuron vertex = iter.next();
+            System.out.println(
+                    "Vertex " + vertex + " is connected to: "
+                            + network.edgesOf(vertex));
+        }
+
     }
 
     PVector react() {

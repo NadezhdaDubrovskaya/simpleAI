@@ -11,25 +11,27 @@ class Configuration {
      * If false then it will behave as a regular game and player will be given an opportunity to run and avoid AIs
      * If true then it means the game is in the mode of teaching AIs
      */
-    static final boolean IS_AI_MODE = true;
+    static final boolean IS_AI_MODE = false;
 
     static final int WIDTH = 800;
     static final int HEIGHT = 800;
 
-    //genetic algorithm
-    static final int AMOUNT_OF_PLAYERS = 500; //should be even number and at least 4
-    static final int AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION = AMOUNT_OF_PLAYERS / 10;
+    static final int MONSTER_RADIUS = 20;
 
     static final PVector PLAYER_START_POSITION = new PVector(400, 400);
     static final Colour PLAYER_COLOR = new Colour(255, 255, 0);
     static final Colour BEST_PLAYER_COLOR = new Colour(0, 255, 0);
-    static final int PLAYER_SPEED_LIMIT = 5;
+    static final int PLAYER_SPEED_LIMIT = 3;
 
     static final int DISTANCE_THRESHOLD = 50;
     static final List<Integer> HIDDEN_LAYERS_CONFIGURATION = Arrays.asList(3);
     static final int AMOUNT_OF_INPUT_NEURONS = 4; // do not change
     static final int AMOUNT_OF_OUTPUT_NEURONS = 2; //do not change
     static int AMOUNT_OF_CONNECTIONS;
+
+    //genetic algorithm
+    static final int AMOUNT_OF_PLAYERS = 500; //should be even number and at least 4
+    static final int AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION = AMOUNT_OF_PLAYERS / 10;
 
     static {
         // main connections

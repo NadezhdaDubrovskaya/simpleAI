@@ -9,10 +9,11 @@ abstract class ScreenObject {
 
     private final PApplet pApplet;
     private final PVector position = new PVector();
-    private Colour colour = new Colour(0, 0, 0);
+    private final Colour colour;
 
     ScreenObject(final PApplet pApplet) {
         this.pApplet = pApplet;
+        colour = new Colour(0, 0, 0);
     }
 
     PApplet getPApplet() {
@@ -30,10 +31,6 @@ abstract class ScreenObject {
 
     Colour getColour() {
         return colour;
-    }
-
-    void setColour(final Colour colour) {
-        this.colour = colour;
     }
 
     void setColour(final int v1, final int v2, final int v3) {

@@ -30,7 +30,7 @@ class Player extends CircularObject {
         getPosition().set(PLAYER_START_POSITION.x, PLAYER_START_POSITION.y);
         velocity.set(0, 0);
         setDead(false);
-        setColour(PLAYER_COLOR);
+        setColour(PLAYER_COLOR.v1, PLAYER_COLOR.v2, PLAYER_COLOR.v3);
     }
 
     @Override

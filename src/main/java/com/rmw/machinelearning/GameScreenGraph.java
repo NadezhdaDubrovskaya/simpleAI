@@ -4,7 +4,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import processing.core.PVector;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,8 @@ import java.util.Set;
 import static com.rmw.machinelearning.Configuration.HEIGHT;
 import static com.rmw.machinelearning.Configuration.MONSTER_RADIUS;
 import static com.rmw.machinelearning.Configuration.WIDTH;
+import static java.util.Collections.emptyList;
+import static org.jgrapht.alg.shortestpath.DijkstraShortestPath.findPathBetween;
 
 class GameScreenGraph {
 
@@ -26,7 +27,12 @@ class GameScreenGraph {
     }
 
     List<PVector> calculatePath(final PVector from, final PVector to) {
-        throw new NotImplementedException();
+        try {
+            return findPathBetween(graph, findClosestVertex(from), findClosestVertex(to))
+                    .getVertexList();
+        } catch (final RuntimeException e) {
+            return emptyList();
+        }
     }
 
     Set<PVector> getAllVertexes() {
@@ -59,6 +65,29 @@ class GameScreenGraph {
     }
 
     private void connectVertexes() {
-
+        final Set<PVector> vertexes = graph.vertexSet();
+        vertexes.forEach(vertex -> {
+            final PVector rightNeighbor = findVectorWithCoordinatesInGraph(vertex.x + MONSTER_RADIUS, vertex.y);
+            if (rightNeighbor != null) {
+                graph.addEdge(vertex, rightNeighbor);
+            }
+            final PVector bottomNeighbor = findVectorWithCoordinatesInGraph(vertex.x, vertex.y + MONSTER_RADIUS);
+            if (bottomNeighbor != null) {
+                graph.addEdge(vertex, bottomNeighbor);
+            }
+        });
     }
+
+    private PVector findVectorWithCoordinatesInGraph(final float x, final float y) {
+        return graph.vertexSet().stream().filter(v -> v.x == x && v.y == y).findAny().orElse(null);
+    }
+
+    private PVector findClosestVertex(final PVector position) {
+        int x = Math.round(position.x);
+        int y = Math.round(position.y);
+        x = x - x % MONSTER_RADIUS;
+        y = y - y % MONSTER_RADIUS;
+        return findVectorWithCoordinatesInGraph(x, y);
+    }
+
 }

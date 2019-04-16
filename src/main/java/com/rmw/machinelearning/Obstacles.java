@@ -39,8 +39,8 @@ class Obstacles {
         screenObjects.forEach(ScreenObject::update);
     }
 
-    void addEvilAI() {
-        screenObjects.add(new Monster(pApplet));
+    void addEvilAI(final Monster monster) {
+        screenObjects.add(monster);
     }
 
     private void setupWalls() {

@@ -17,6 +17,7 @@ public class Main extends PApplet {
     private final Set<CircularObject> circularObjects = new HashSet<>();
     private Population population;
     private Player player;
+    private Monster monster;
 
     public static void main(final String[] args) {
         PApplet.main("com.rmw.machinelearning.Main", args);
@@ -36,15 +37,20 @@ public class Main extends PApplet {
             population = new Population(this);
         } else {
             player = new Player(this);
+            monster = new Monster(this, gameScreenGraph);
+            monster.setPosition(40, 40);
+            monster.setTarget(player);
+            monster.setColour(255, 0, 0);
+            obstacles.addEvilAI(monster);
         }
-        gameScreenGraph.getAllVertexes().forEach(
+/*        gameScreenGraph.getAllVertexes().forEach(
                 vertex -> {
                     final Player vertexPlayer = new Player(this);
                     vertexPlayer.setRadius(5);
                     vertexPlayer.setPosition(vertex.x, vertex.y);
                     circularObjects.add(vertexPlayer);
                 }
-        );
+        );*/
     }
 
     @Override
@@ -55,8 +61,9 @@ public class Main extends PApplet {
             population.update();
         } else {
             player.update();
+            monster.update();
         }
-        circularObjects.forEach(CircularObject::update);
+        // circularObjects.forEach(CircularObject::update);
     }
 
     @Override

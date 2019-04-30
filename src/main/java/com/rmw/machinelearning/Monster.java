@@ -5,14 +5,18 @@ import processing.core.PVector;
 
 import java.util.List;
 
+import static com.rmw.machinelearning.Configuration.MONSTER_RADIUS;
+import static java.util.Collections.emptyList;
+
 class Monster extends Player {
 
     private final GameScreenGraph gameScreenGraph;
     private Player target;
 
     Monster(final PApplet p, final GameScreenGraph gameScreenGraph) {
-        super(p);
+        super(p, emptyList());
         this.gameScreenGraph = gameScreenGraph;
+        setRadius(MONSTER_RADIUS);
     }
 
     void setTarget(final Player target) {

@@ -3,6 +3,7 @@ package com.rmw.machinelearning;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -18,25 +19,28 @@ import static org.jgrapht.alg.shortestpath.DijkstraShortestPath.findPathBetween;
 class GameScreenGraph {
 
     private final Graph<PVector, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
-    private final List<ScreenObject> obstacles = Obstacles.getInstance(null).getObstacles();
+    private final List<ScreenObject> obstacles;
 
-    GameScreenGraph() {
+    GameScreenGraph(final List<ScreenObject> obstacles) {
+        this.obstacles = obstacles;
+    }
+
+    void setUpGraph() {
+        final long startTime = System.currentTimeMillis();
         createAllPossibleVertexes();
         removeVertexesInsideAndNearObstacles();
         connectVertexes();
+        final long stopTime = System.currentTimeMillis();
+        final long elapsedTime = stopTime - startTime;
+        PApplet.println("GameScreenGraph took " + elapsedTime + " ms to be created");
     }
 
     List<PVector> calculatePath(final PVector from, final PVector to) {
         try {
-            return findPathBetween(graph, findClosestVertex(from), findClosestVertex(to))
-                    .getVertexList();
+            return findPathBetween(graph, findClosestVertex(from), findClosestVertex(to)).getVertexList();
         } catch (final RuntimeException e) {
             return emptyList();
         }
-    }
-
-    Set<PVector> getAllVertexes() {
-        return graph.vertexSet();
     }
 
     private void createAllPossibleVertexes() {
@@ -89,5 +93,4 @@ class GameScreenGraph {
         y = y - y % MONSTER_RADIUS;
         return findVectorWithCoordinatesInGraph(x, y);
     }
-
 }

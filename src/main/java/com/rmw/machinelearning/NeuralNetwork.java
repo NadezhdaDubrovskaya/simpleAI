@@ -3,19 +3,12 @@ package com.rmw.machinelearning;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
-import org.jgrapht.traverse.DepthFirstIterator;
+import processing.core.PApplet;
 import processing.core.PVector;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.StringWriter;
-import java.io.Writer;
-import java.rmi.server.ExportException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
 
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_INPUT_NEURONS;
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_OUTPUT_NEURONS;
@@ -30,35 +23,17 @@ class NeuralNetwork {
 
     private static final String HIDDEN_NEURON_NAME_TEMPLATE = "HIDDEN{0}_{1}";
     private final Graph<Neuron, DefaultWeightedEdge> network = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
-    private final Neuron biasNeuron;
-    private List<Float> weights;
+    private final Neuron biasNeuron = new Neuron(BIAS.name(), BIAS);
+    private final List<Float> weights;
 
     NeuralNetwork(final List<Float> weights) {
-        biasNeuron = new Neuron(BIAS.name(), BIAS);
-        biasNeuron.setValue(1f);
         this.weights = weights;
+        biasNeuron.setValue(1f);
         setupNeurons();
         setupConnections();
-
-        Iterator<Neuron> iter = new DepthFirstIterator<>(network);
-        while (iter.hasNext()) {
-            Neuron vertex = iter.next();
-            System.out.println(
-                    "Vertex " + vertex + " is connected to: "
-                            + network.edgesOf(vertex));
-        }
-
     }
 
     PVector react() {
-        throw new NotImplementedException();
-    }
-
-    List<Float> getWeights() {
-        return weights;
-    }
-
-    void setWeights(final List<Float> weights) {
         throw new NotImplementedException();
     }
 

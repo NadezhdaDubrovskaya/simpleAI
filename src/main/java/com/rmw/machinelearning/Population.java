@@ -11,16 +11,17 @@ class Population {
     private static final String NEW_GENERATION_READY = "Generation {0} is ready and contains {1} computerPlayers";
     private static final int MAX_UPDATES = 5000;
 
-    private final Obstacles obstacles;
-    private final GeneticAlgorithm geneticAlgorithm;
     private final List<ComputerPlayer> computerPlayers;
+    private final List<ScreenObject> obstacles;
+    private final GeneticAlgorithm geneticAlgorithm;
+
     private int generationCounter;
     private int currentUpdate;
 
-    Population(final PApplet pApplet) {
-        geneticAlgorithm = new GeneticAlgorithm(pApplet);
+    Population(final PApplet pApplet, final List<ScreenObject> obstacles) {
+        geneticAlgorithm = new GeneticAlgorithm(pApplet, obstacles);
         computerPlayers = geneticAlgorithm.getInitialPopulation();
-        obstacles = Obstacles.getInstance(pApplet);
+        this.obstacles = obstacles;
     }
 
     void update() {
@@ -30,7 +31,7 @@ class Population {
             generationCounter++;
             currentUpdate = 0;
             geneticAlgorithm.getNextPopulation();
-            obstacles.getObstacles().forEach(ScreenObject::reset);
+            obstacles.forEach(ScreenObject::reset);
             PApplet.println(format(NEW_GENERATION_READY, generationCounter, computerPlayers.size()));
         }
         currentUpdate++;

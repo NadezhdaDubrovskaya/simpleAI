@@ -4,7 +4,7 @@ import processing.core.PApplet;
 
 abstract class CircularObject extends ScreenObject {
 
-    private int radius = 20;
+    private float radius = 10;
 
     CircularObject(final PApplet pApplet) {
         super(pApplet);
@@ -14,7 +14,7 @@ abstract class CircularObject extends ScreenObject {
         this.radius = radius;
     }
 
-    int getRadius() {
+    float getRadius() {
         return radius;
     }
 

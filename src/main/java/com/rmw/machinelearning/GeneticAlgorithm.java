@@ -3,7 +3,6 @@ package com.rmw.machinelearning;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_CONNECTIONS;
@@ -11,26 +10,35 @@ import static com.rmw.machinelearning.Configuration.AMOUNT_OF_MUTATED_BABIES_IN_
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_PLAYERS;
 import static com.rmw.machinelearning.Utility.maybeYes;
 import static java.lang.Math.round;
+import static java.util.Comparator.comparing;
 
 class GeneticAlgorithm {
 
     private final PApplet pApplet;
+    private final List<ScreenObject> obstacles;
     private final List<ComputerPlayer> computerPlayers = new ArrayList<>();
     private int bestScoreSoFar;
 
-    GeneticAlgorithm(final PApplet p) {
+    GeneticAlgorithm(final PApplet p, final List<ScreenObject> obstacles) {
         pApplet = p;
+        this.obstacles = obstacles;
     }
 
     List<ComputerPlayer> getInitialPopulation() {
+        long startTime = System.currentTimeMillis();
         for (int i = 0; i < AMOUNT_OF_PLAYERS; i++) {
-            computerPlayers.add(new ComputerPlayer(pApplet, generateRandomWeights()));
+            final ComputerPlayer player = new ComputerPlayer(pApplet, obstacles);
+            final Brain brain = new Brain(generateRandomWeights());
+            player.setBrain(brain);
+            computerPlayers.add(player);
         }
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        PApplet.println("Initial population had been created in " + elapsedTime + " ms");
         return computerPlayers;
     }
 
     void getNextPopulation() {
-
         sortPlayerBasedOnTheirFitnessScore();
         // in case the whole generation failed (instant death) - give them another chance
         // this can happen if evil AI is located at the respawn location
@@ -45,20 +53,9 @@ class GeneticAlgorithm {
         getReadyForTheNextRound();
     }
 
-    private void getReadyForTheNextRound() {
-        computerPlayers.forEach(ComputerPlayer::reset);
-        int greenColorIntensity = 255;
-        for (final ComputerPlayer computerPlayer : computerPlayers) {
-            computerPlayer.setColour(150, greenColorIntensity, 0);
-            if (greenColorIntensity > 0) {
-                greenColorIntensity--;
-            }
-        }
-    }
-
     private void sortPlayerBasedOnTheirFitnessScore() {
         computerPlayers.forEach(ComputerPlayer::calculateFitness);
-        computerPlayers.sort(Comparator.comparing(ComputerPlayer::getFitnessScore).reversed());
+        computerPlayers.sort(comparing(ComputerPlayer::getFitnessScore).reversed());
     }
 
     private void getStatistics() {
@@ -67,16 +64,15 @@ class GeneticAlgorithm {
         PApplet.println("Total fitness score of the whole generation: " + totalFitnessScore);
         PApplet.println("Best score so far: " + bestScoreSoFar);
         PApplet.println("Best genes: " + computerPlayers.get(0).getWeights());
+        PApplet.println("Current best is " + computerPlayers.get(0));
     }
 
-    /**
-     * We do not create new player here but rather modify the genes of the existing ones
-     */
     private void breedTheBestOnes() {
         final int middleIndex = computerPlayers.size() / 4 + 1;
         for (int i = 0, j = middleIndex; i < middleIndex && j < computerPlayers.size(); i++, j++) {
             final List<Float> newGenes = getBabyGenes(computerPlayers.get(i), computerPlayers.get(i + 1));
-            computerPlayers.get(j).changeWeights(newGenes);
+            final Brain newBrain = new Brain(newGenes);
+            computerPlayers.get(j).setBrain(newBrain);
         }
     }
 
@@ -116,11 +112,20 @@ class GeneticAlgorithm {
         }
     }
 
+    private void getReadyForTheNextRound() {
+        computerPlayers.forEach(ComputerPlayer::reset);
+        int greenColorIntensity = 255;
+        for (final ComputerPlayer computerPlayer : computerPlayers) {
+            computerPlayer.setColour(150, greenColorIntensity, 0);
+            if (greenColorIntensity > 0) {
+                greenColorIntensity--;
+            }
+        }
+    }
+
     private void restartCurrentGeneration() {
         PApplet.println("Oops, bad luck. Let's try again");
-        final List<ComputerPlayer> copy = new ArrayList<>(computerPlayers);
-        computerPlayers.clear();
-        copy.forEach(computerPlayer -> computerPlayers.add(new ComputerPlayer(pApplet, computerPlayer.getWeights())));
+        computerPlayers.forEach(ComputerPlayer::reset);
         PApplet.println("Best score so far: " + bestScoreSoFar);
     }
 

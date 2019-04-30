@@ -11,12 +11,12 @@ class Configuration {
      * If false then it will behave as a regular game and player will be given an opportunity to run and avoid AIs
      * If true then it means the game is in the mode of teaching AIs
      */
-    static final boolean IS_AI_MODE = false;
+    static final boolean IS_AI_MODE = true;
 
     static final int WIDTH = 800;
     static final int HEIGHT = 800;
 
-    static final int MONSTER_RADIUS = 20;
+    static final int MONSTER_RADIUS = 10;
 
     static final PVector PLAYER_START_POSITION = new PVector(400, 400);
     static final Colour PLAYER_COLOR = new Colour(255, 255, 0);

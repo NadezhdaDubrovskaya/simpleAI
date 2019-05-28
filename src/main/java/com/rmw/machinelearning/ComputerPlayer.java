@@ -1,6 +1,7 @@
 package com.rmw.machinelearning;
 
 import processing.core.PApplet;
+import processing.core.PVector;
 
 import java.util.List;
 
@@ -16,6 +17,11 @@ class ComputerPlayer extends Player {
     }
 
     @Override
+    public String toString() {
+        return "Player with genes: " + brain;
+    }
+
+    @Override
     void reset() {
         super.reset();
         survivedForXMoves = 0;
@@ -25,8 +31,9 @@ class ComputerPlayer extends Player {
     @Override
     void update() {
         if (!isDead()) {
-            brain.look();
-            brain.react();
+            brain.look(getPosition());
+            final PVector velocity = brain.react();
+            setVelocity(velocity.x, velocity.y);
         }
         super.update();
     }

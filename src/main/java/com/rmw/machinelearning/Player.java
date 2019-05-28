@@ -50,11 +50,9 @@ class Player extends CircularObject {
         final boolean isColliding = obstacles
                 .stream()
                 .anyMatch(obstacle -> {
-                    final boolean xAxisCollision =
-                            getRightBorder() >= obstacle.getLeftBorder()
+                    final boolean xAxisCollision = getRightBorder() >= obstacle.getLeftBorder()
                                     && getLeftBorder() <= obstacle.getRightBorder();
-                    final boolean yAxisCollision =
-                            getBottomBorder() >= obstacle.getTopBorder()
+                    final boolean yAxisCollision = getBottomBorder() >= obstacle.getTopBorder()
                                     && getTopBorder() <= obstacle.getBottomBorder();
                     return xAxisCollision && yAxisCollision;
                 });

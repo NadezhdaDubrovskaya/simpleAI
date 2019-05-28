@@ -3,11 +3,10 @@ package com.rmw.machinelearning;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
-import processing.core.PApplet;
 import processing.core.PVector;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_INPUT_NEURONS;
@@ -34,13 +33,40 @@ class NeuralNetwork {
     }
 
     PVector react() {
-        throw new NotImplementedException();
+        final List<Neuron> hiddenNeurons = getNeuronsOfType(HIDDEN);
+        final List<Neuron> outputNeuron = getNeuronsOfType(OUTPUT);
+        calculateValues(hiddenNeurons);
+        calculateValues(outputNeuron);
+        return new PVector(outputNeuron.get(0).getValue(), outputNeuron.get(1).getValue());
     }
 
-    void setInputs(final Vision vision) {
+    private void calculateValues(final List<Neuron> neurons) {
+        neurons.forEach(neuron -> {
+            final Set<DefaultWeightedEdge> connectedNeurons = network.incomingEdgesOf(neuron);
+            connectedNeurons.forEach(edge -> {
+                final Neuron sourceNeurone = network.getEdgeSource(edge);
+                final float weight = (float) network.getEdgeWeight(edge);
+                neuron.setValue(neuron.getValue() + (sourceNeurone.getValue() * weight));
+            });
+            final double sum = (double) neuron.getValue();
+            final double resultOfActivationFunction;
+            if (sum > 0) {
+                resultOfActivationFunction = sum >= 1 ? 1 : 0;
+            } else if (sum < 0){
+                resultOfActivationFunction = sum <= 1 ? -1 : 0;
+            } else {
+                resultOfActivationFunction = 0;
+            }
+            neuron.setValue((float) resultOfActivationFunction);
+        });
+    }
+
+    void setInputs(final List<Float> inputs) {
         final List<Neuron> inputNeurons = getNeuronsOfType(INPUT);
-        vision.getSides().forEach((direction, value) ->
-                inputNeurons.get(direction.getIndex()).setValue(value));
+        for (int i = 0; i < 4; i++) {
+            inputNeurons.get(i).setValue(inputs.get(i));
+        }
+        biasNeuron.setValue(1); //BIAS is always 1
     }
 
     private void setupNeurons() {

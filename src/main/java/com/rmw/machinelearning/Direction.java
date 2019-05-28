@@ -6,7 +6,7 @@ public enum Direction {
     LEFT(1),
     TOP(2),
     BOTTOM(3),
-    BIAS(3);
+    BIAS(4);
 
     private final int neuronIndex;
 

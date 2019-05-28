@@ -3,9 +3,9 @@ package com.rmw.machinelearning;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import processing.core.PApplet;
 import processing.core.PVector;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -23,16 +23,7 @@ class GameScreenGraph {
 
     GameScreenGraph(final List<ScreenObject> obstacles) {
         this.obstacles = obstacles;
-    }
-
-    void setUpGraph() {
-        final long startTime = System.currentTimeMillis();
-        createAllPossibleVertexes();
-        removeVertexesInsideAndNearObstacles();
-        connectVertexes();
-        final long stopTime = System.currentTimeMillis();
-        final long elapsedTime = stopTime - startTime;
-        PApplet.println("GameScreenGraph took " + elapsedTime + " ms to be created");
+        setUpGraph();
     }
 
     List<PVector> calculatePath(final PVector from, final PVector to) {
@@ -41,6 +32,53 @@ class GameScreenGraph {
         } catch (final RuntimeException e) {
             return emptyList();
         }
+    }
+
+    /**
+     * Determines if there is a free space in the passed direction based on the game screen graph
+     * that is build in accordance to the obstacles on the map
+     *
+     * @param position  - coordinates of the player.
+     *                  Note that they are going to be rounded to the closest vertex in the graph
+     * @param direction - direction in which the presence of a free space will be checked
+     * @return true in case there is an obstacle in that direction
+     * false in case the path is clear in the chosen direction and no obstacle is found
+     */
+    boolean isThereAnObstacleNearBy(final PVector position, final Direction direction) {
+        final PVector closestVertex = findClosestVertex(position);
+        if (closestVertex == null) {
+            // throw new IllegalArgumentException("Couldn't find closest vertex to the player position");
+            return true;
+        }
+        float xCoordinate = closestVertex.x;
+        float yCoordinate = closestVertex.y;
+        switch (direction) {
+            case LEFT:
+                xCoordinate -= MONSTER_RADIUS*2;
+                break;
+            case RIGHT:
+                xCoordinate += MONSTER_RADIUS*2;
+                break;
+            case TOP:
+                yCoordinate -= MONSTER_RADIUS*2;
+                break;
+            case BOTTOM:
+                yCoordinate += MONSTER_RADIUS*2;
+                break;
+            default:
+                throw new InvalidParameterException("Unsupported direction " + direction);
+        }
+        return findVectorWithCoordinatesInGraph(xCoordinate, yCoordinate) == null;
+    }
+
+    void setUpGraph() {
+        createAllPossibleVertexes();
+        removeVertexesInsideAndNearObstacles();
+        connectVertexes();
+    }
+
+    Set<PVector> getAllVertexes() {
+        return graph.vertexSet();
     }
 
     private void createAllPossibleVertexes() {

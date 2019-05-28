@@ -1,9 +1,11 @@
 package com.rmw.machinelearning;
 
 import processing.core.PApplet;
+import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.rmw.machinelearning.Configuration.AMOUNT_OF_PLAYERS;
 import static com.rmw.machinelearning.Configuration.HEIGHT;
@@ -17,6 +19,7 @@ public class Main extends PApplet {
     private Population population;
     private Player player;
     private Monster monster;
+    private Player subjectOfMovement;
 
     public static void main(final String[] args) {
         PApplet.main("com.rmw.machinelearning.Main", args);
@@ -30,12 +33,12 @@ public class Main extends PApplet {
     @Override
     public void setup() {
         initializeObstacles();
-        gameScreenGraph.setUpGraph();
+        gameScreenGraph.setUpGraph(); // should be set up after obstacles initialization
         if (IS_AI_MODE) {
             if (AMOUNT_OF_PLAYERS < 4) {
                 throw new IllegalArgumentException("Amount of players can't be less than 4");
             }
-            population = new Population(this, obstacles);
+            population = new Population(this, obstacles, gameScreenGraph);
         } else {
             player = new Player(this, obstacles);
             monster = new Monster(this, gameScreenGraph);
@@ -44,6 +47,7 @@ public class Main extends PApplet {
             monster.setColour(255, 0, 0);
             obstacles.add(monster);
         }
+        subjectOfMovement = IS_AI_MODE ? population.getFirstPlayer() : player;
     }
 
     @Override
@@ -56,27 +60,29 @@ public class Main extends PApplet {
             player.update();
             monster.update();
         }
+
     }
 
     @Override
     public void keyPressed() {
         switch (keyCode) {
             case LEFT:
-                player.setVelocity(-2, 0);
+                subjectOfMovement.setVelocity(-2, 0);
                 break;
             case RIGHT:
-                player.setVelocity(2, 0);
+                subjectOfMovement.setVelocity(2, 0);
                 break;
             case UP:
-                player.setVelocity(0, -2);
+                subjectOfMovement.setVelocity(0, -2);
                 break;
             case DOWN:
-                player.setVelocity(0, 2);
+                subjectOfMovement.setVelocity(0, 2);
                 break;
             default:
-                player.setVelocity(0, 0);
-                player.stop();
+                subjectOfMovement.setVelocity(0, 0);
+                subjectOfMovement.stop();
         }
+
     }
 
     private void initializeObstacles() {

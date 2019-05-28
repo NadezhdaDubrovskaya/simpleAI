@@ -2,56 +2,45 @@ package com.rmw.machinelearning;
 
 import processing.core.PVector;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import static com.rmw.machinelearning.DistanceUtil.calculateDistance;
 
 class Brain {
 
     private final List<Float> weights;
     private final NeuralNetwork neuralNetwork;
-    private final Vision vision;
+    private final GameScreenGraph gameScreenGraph;
 
-    Brain(final List<Float> weights) {
+    Brain(final List<Float> weights, final GameScreenGraph gameScreenGraph) {
         this.weights = weights;
+        this.gameScreenGraph = gameScreenGraph;
         neuralNetwork = new NeuralNetwork(weights);
-        vision = new Vision();
+    }
+
+
+    void look(final PVector currentPlayerPosition) {
+        final List<Float> inputs = new ArrayList<>();
+        for (final Direction direction : Direction.values()) {
+            if (direction == Direction.BIAS) {
+                break;
+            }
+            final boolean obstaclePresent = gameScreenGraph.isThereAnObstacleNearBy(currentPlayerPosition, direction);
+            inputs.add(obstaclePresent ? 1f : 0f);
+        }
+        neuralNetwork.setInputs(inputs);
+    }
+
+    PVector react() {
+        return neuralNetwork.react();
     }
 
     List<Float> getWeights() {
         return weights;
     }
 
-    void look() {
-/*        brain.look();
-        vision.reset();
-        for (final ScreenObject obstacle : getObstacles()) {
-            final Side side = calculateDistance(this, obstacle);
-            if (side != null) {
-                checkThreshold(side);
-            }
-        }
-        neuralNetwork.setInputs(vision);*/
+    @Override
+    public String toString() {
+        return Arrays.toString(weights.toArray());
     }
-
-    void react() {
-/*        final PVector reaction = neuralNetwork.react();
-        if (reaction.x != 0 || reaction.y != 0) {
-            setVelocity(reaction.x, reaction.y);
-        } else {
-            stop();
-        }*/
-    }
-
-
-    private void checkThreshold(final Side side) {
-        final Direction direction = side.getDirection();
-        final float dist = side.getDistance();
-        final float newNeuronValue = 100 / dist;
-        //update input value only in case the new object is closer
-        if (newNeuronValue > vision.get(direction)) {
-            vision.put(direction, newNeuronValue);
-        }
-    }
-
 }

@@ -16,25 +16,23 @@ class GeneticAlgorithm {
 
     private final PApplet pApplet;
     private final List<ScreenObject> obstacles;
+    private final GameScreenGraph gameScreenGraph;
     private final List<ComputerPlayer> computerPlayers = new ArrayList<>();
     private int bestScoreSoFar;
 
-    GeneticAlgorithm(final PApplet p, final List<ScreenObject> obstacles) {
+    GeneticAlgorithm(final PApplet p, final List<ScreenObject> obstacles, final GameScreenGraph gameScreenGraph) {
         pApplet = p;
         this.obstacles = obstacles;
+        this.gameScreenGraph = gameScreenGraph;
     }
 
     List<ComputerPlayer> getInitialPopulation() {
-        long startTime = System.currentTimeMillis();
         for (int i = 0; i < AMOUNT_OF_PLAYERS; i++) {
             final ComputerPlayer player = new ComputerPlayer(pApplet, obstacles);
-            final Brain brain = new Brain(generateRandomWeights());
+            final Brain brain = new Brain(generateRandomWeights(), gameScreenGraph);
             player.setBrain(brain);
             computerPlayers.add(player);
         }
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        PApplet.println("Initial population had been created in " + elapsedTime + " ms");
         return computerPlayers;
     }
 
@@ -63,7 +61,6 @@ class GeneticAlgorithm {
         final int totalFitnessScore = computerPlayers.stream().mapToInt(ComputerPlayer::getFitnessScore).sum();
         PApplet.println("Total fitness score of the whole generation: " + totalFitnessScore);
         PApplet.println("Best score so far: " + bestScoreSoFar);
-        PApplet.println("Best genes: " + computerPlayers.get(0).getWeights());
         PApplet.println("Current best is " + computerPlayers.get(0));
     }
 
@@ -71,7 +68,7 @@ class GeneticAlgorithm {
         final int middleIndex = computerPlayers.size() / 4 + 1;
         for (int i = 0, j = middleIndex; i < middleIndex && j < computerPlayers.size(); i++, j++) {
             final List<Float> newGenes = getBabyGenes(computerPlayers.get(i), computerPlayers.get(i + 1));
-            final Brain newBrain = new Brain(newGenes);
+            final Brain newBrain = new Brain(newGenes, gameScreenGraph);
             computerPlayers.get(j).setBrain(newBrain);
         }
     }

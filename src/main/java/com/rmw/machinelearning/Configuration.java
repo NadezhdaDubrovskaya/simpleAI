@@ -2,7 +2,7 @@ package com.rmw.machinelearning;
 
 import processing.core.PVector;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 class Configuration {
@@ -11,7 +11,7 @@ class Configuration {
      * If false then it will behave as a regular game and player will be given an opportunity to run and avoid AIs
      * If true then it means the game is in the mode of teaching AIs
      */
-    static final boolean IS_AI_MODE = true;
+    static final boolean IS_AI_MODE = false;
 
     static final int WIDTH = 800;
     static final int HEIGHT = 800;
@@ -23,15 +23,13 @@ class Configuration {
     static final Colour BEST_PLAYER_COLOR = new Colour(0, 255, 0);
     static final int PLAYER_SPEED_LIMIT = 3;
 
-    static final int DISTANCE_THRESHOLD = 50;
-    static final List<Integer> HIDDEN_LAYERS_CONFIGURATION = Arrays.asList(3);
     static final int AMOUNT_OF_INPUT_NEURONS = 4; // do not change
     static final int AMOUNT_OF_OUTPUT_NEURONS = 2; //do not change
-    static int AMOUNT_OF_CONNECTIONS;
-
+    static final List<Integer> HIDDEN_LAYERS_CONFIGURATION = Collections.emptyList();
     //genetic algorithm
-    static final int AMOUNT_OF_PLAYERS = 500; //should be even number and at least 4
+    static final int AMOUNT_OF_PLAYERS = 100; //should be even number and at least 4
     static final int AMOUNT_OF_MUTATED_BABIES_IN_THE_POPULATION = AMOUNT_OF_PLAYERS / 10;
+    static int AMOUNT_OF_CONNECTIONS;
 
     static {
         // main connections
@@ -49,6 +47,9 @@ class Configuration {
         // connections with bias neuron
         AMOUNT_OF_CONNECTIONS += AMOUNT_OF_OUTPUT_NEURONS;
         HIDDEN_LAYERS_CONFIGURATION.forEach(amount -> AMOUNT_OF_CONNECTIONS += amount);
+    }
+
+    private Configuration() {
     }
 
     static class Colour {

@@ -9,7 +9,7 @@ import static java.text.MessageFormat.format;
 class Population {
 
     private static final String NEW_GENERATION_READY = "Generation {0} is ready and contains {1} computerPlayers";
-    private static final int MAX_UPDATES = 5000;
+    private static final int MAX_UPDATES = 200;
 
     private final List<ComputerPlayer> computerPlayers;
     private final List<ScreenObject> obstacles;
@@ -18,8 +18,8 @@ class Population {
     private int generationCounter;
     private int currentUpdate;
 
-    Population(final PApplet pApplet, final List<ScreenObject> obstacles) {
-        geneticAlgorithm = new GeneticAlgorithm(pApplet, obstacles);
+    Population(final PApplet pApplet, final List<ScreenObject> obstacles, final GameScreenGraph gameScreenGraph) {
+        geneticAlgorithm = new GeneticAlgorithm(pApplet, obstacles, gameScreenGraph);
         computerPlayers = geneticAlgorithm.getInitialPopulation();
         this.obstacles = obstacles;
     }
@@ -35,6 +35,10 @@ class Population {
             PApplet.println(format(NEW_GENERATION_READY, generationCounter, computerPlayers.size()));
         }
         currentUpdate++;
+    }
+
+    Player getFirstPlayer() {
+        return computerPlayers.get(0);
     }
 
 }

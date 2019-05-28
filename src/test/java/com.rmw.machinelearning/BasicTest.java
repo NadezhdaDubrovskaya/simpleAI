@@ -24,13 +24,7 @@ public class BasicTest {
         weights.add(1f); weights.add(1f);
         weights.add(1f);
 
-        final Vision vision = new Vision();
-        vision.put(Direction.TOP, 1);
-        vision.put(Direction.BOTTOM, 1);
-        vision.put(Direction.LEFT, 1);
-        vision.put(Direction.RIGHT, 1);
         final NeuralNetwork neuralNetwork = new NeuralNetwork(weights);
-        neuralNetwork.setInputs(vision);
         final PVector pVector = neuralNetwork.react();
         System.out.println("x: " + pVector.x + " y: " + pVector.y);
     }

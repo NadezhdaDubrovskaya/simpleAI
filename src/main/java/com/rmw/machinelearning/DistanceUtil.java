@@ -1,5 +1,7 @@
 package com.rmw.machinelearning;
 
+import javafx.util.Pair;
+
 class DistanceUtil {
 
     /**
@@ -10,7 +12,7 @@ class DistanceUtil {
      * If passed objects do not lie on any of the 4 possible directions, null is going to be returned
      * In case of the collision the distance is going to be 0
      */
-    static Side calculateDistance(final ScreenObject object1, final ScreenObject object2) {
+    static Pair<Direction, Float> calculateDistance(final ScreenObject object1, final ScreenObject object2) {
 
         final boolean sameVertical =
                 object1.getRightBorder() >= object2.getLeftBorder()
@@ -21,23 +23,23 @@ class DistanceUtil {
 
         if (sameHorizontal && sameVertical) {
             // means that the objects are colliding
-            return new Side(Direction.BIAS, 0);
+            return new Pair<>(Direction.BIAS, 0f);
         }
 
         if (sameVertical) {
             final float distanceOnY = object1.getTopBorder() - object2.getBottomBorder();
             if (distanceOnY > 0) {
-                return new Side(Direction.TOP, distanceOnY);
+                return new Pair<>(Direction.TOP, distanceOnY);
             } else {
-                return new Side(Direction.BOTTOM, object2.getTopBorder() - object1.getBottomBorder());
+                return new Pair<>(Direction.BOTTOM, object2.getTopBorder() - object1.getBottomBorder());
             }
         }
         if (sameHorizontal) {
             final float distanceOnX = object1.getLeftBorder() - object2.getRightBorder();
             if (distanceOnX > 0) {
-                return new Side(Direction.LEFT, distanceOnX);
+                return new Pair<>(Direction.LEFT, distanceOnX);
             } else {
-                return new Side(Direction.RIGHT, object2.getLeftBorder() - object1.getRightBorder());
+                return new Pair<>(Direction.RIGHT, object2.getLeftBorder() - object1.getRightBorder());
             }
         }
         return null;

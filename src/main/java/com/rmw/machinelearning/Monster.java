@@ -14,7 +14,7 @@ class Monster extends Player {
     private Player target;
 
     Monster(final PApplet p, final GameScreenGraph gameScreenGraph) {
-        super(p, emptyList());
+        super(p, emptyList()); //monsters do not care about the obstacles
         this.gameScreenGraph = gameScreenGraph;
         setRadius(MONSTER_RADIUS);
     }
@@ -25,7 +25,6 @@ class Monster extends Player {
 
     @Override
     void move() {
-        // monsters never die, he he he
         final List<PVector> path = gameScreenGraph.calculatePath(getPosition(), target.getPosition());
         if (path != null && !path.isEmpty()) {
             final PVector nextPosition = selectNextPosition(path);
